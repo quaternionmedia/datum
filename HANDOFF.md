@@ -5,9 +5,44 @@
 **Date:** 2026-08-08.
 
 This packet is self-contained. It does not assume you can see the conversation
-that produced it. Read this file, then `PLAN.md`, then the drafts in `adr/`,
-then start at WP-0. If this packet and any other source disagree, this packet
-is wrong and the ADRs are right — say so rather than proceeding.
+that produced it. Read this file, then `PLAN.md`, then the drafts in
+`governance/qm/adr/`, then start at the work package **State on arrival**
+names as next. If this packet and any other source disagree, this packet is
+wrong and the ADRs are right — say so rather than proceeding.
+
+**State on arrival** is unnumbered on purpose: it is maintained by execution
+sessions and is the only part of this file that changes as work lands.
+Everything from §0 down is the planning session's packet, amended only where
+§6's report-back obligation found it wrong; those amendments are marked in
+place.
+
+---
+
+## State on arrival
+
+**WP-0 is complete and verified. WP-1 is next.** Nothing has been pushed:
+both git branches described below exist only on the machine that built them.
+
+What exists:
+
+| | |
+|---|---|
+| Project repository | `main` at one commit. Governance wiring only — no schema, firmware, hardware or geometry. |
+| `governance/qm` submodule | Pinned to `project/tessera` at that branch's tip, cut from qm `main`. |
+| Decision records | Five, numberless, Status untouched, at `governance/qm/adr/`. |
+| CI | `adr-lint.yml` only, verbatim from the seed. **No license gate** — see the correction in WP-0 below. |
+
+Verified against a real fresh clone, not asserted: `CLAUDE.md` and
+`.github/copilot-instructions.md` resolve to `AGENTS.md` in full; the lint's
+exact expression is clean over all five drafts; `git submodule update
+--remote` lands on the branch tip with no drift.
+
+**Before your first commit,** read `AGENTS.md`. The rule that will catch you
+out is human-only contributorship: no `Co-Authored-By:` trailer naming a
+vendor `noreply@` address, even if your tooling appends one by default.
+
+**Open questions have moved.** Q1 is still open and the placeholder is in
+force. Q4 turns out to be larger than a venue preference — see §2.
 
 ---
 
@@ -31,20 +66,23 @@ draw as a constraint.
   No `.scad` files land in the project repository.
 
 **Governance.** This project adopts the `quaternionmedia/qm` constitution by
-reference. Read `governance/qm/AGENTS.md` before your first action; it is
-placed in the paths you already walk for exactly this reason. The rules that
-will bite you first:
+reference. Read this repository's own root `AGENTS.md` before your first
+action, then `governance/qm/README.md` and `PRINCIPLES.md`; they are placed
+in the paths you already walk for exactly this reason. The rules that will
+bite you first:
 
 - Decision records are numberless drafts (`ADR-XXXX`) until a human ratifies
   them. **You draft; humans ratify.** Never assign a number.
 - Drafts have no memory. If a decision changes while drafting, rewrite the
   draft as though the final position were held from the start. The CI lint bans
-  a specific vocabulary. Quoted here so you know what to avoid — if a lint runs
-  over this file, this is why it fires: `previously`, `originally`, `earlier
-  draft`, `supersedes the … stance`, `re-review`, `renumber`, `retroactive`,
-  `corrected`. Check `governance/qm/project-seed/ci/adr-lint.yml` for the
-  authoritative list; exclude `HANDOFF.md` from the lint's path glob, or drop
-  this list and rely on the CI file.
+  a specific vocabulary. Quoted here so you know what to avoid: `previously`,
+  `originally`, `earlier draft`, `supersedes the … stance`, `re-review`,
+  `renumber`, `retroactive`, `corrected`. Check
+  `governance/qm/project-seed/ci/adr-lint.yml` for the authoritative list.
+  **Amended:** no path exclusion is needed for this file. The seed lint globs
+  `governance/qm/adr/DRAFT-*.md` only, so it never reaches `HANDOFF.md`, and
+  the workflow is copied verbatim with no edit. If anyone ever broadens that
+  glob, this file needs excluding — the list above is why.
 - One decision per record. If Consequences starts describing a second
   decision, split it.
 - House stack is Python: FastAPI, SQLModel/Pydantic, Click, Jinja2, httpx,
@@ -88,12 +126,36 @@ governance violation, not a shortcut.
 | Q1 | **Project name.** "Tessera" is a placeholder. | Repository creation, package name, MQTT topic root, part names |
 | Q2 | T4 untethered tier: nRF52840 with a BTHome broadcaster, or ESP32-C6 with deep sleep | Nothing in M1 |
 | Q3 | Zigbee end-device firmware: wait for ESPHome's in-flight support, or ship against esp-zigbee and carry a patch | Nothing in M1 |
-| Q4 | Hardware licensing venue: project record, or an amendment to the org open-license record | WP-6 can proceed either way; the record's Status cannot be settled |
+| Q4 | Hardware licensing: **the org corpus has no mechanism that can see a schematic**, so this is not only a venue question — see below | WP-6 can proceed either way; the record's Status cannot be settled |
 | Q5 | Anything requiring USB-C power delivery negotiation | Nothing yet; if you find a reason, that is a finding worth reporting |
 
 **Until Q1 resolves,** use the literal placeholder `tessera` everywhere and
 keep it confined to: the package name, the MQTT topic root constant, and part
-directory names. Do not spread it into prose that would need editing later.
+directory names. Do not spread it into prose that would need editing later. It
+currently also names the governance branch and this repository's directory, so
+that the submodule has something to track; neither is published, and neither
+is a naming decision.
+
+**On Q4, amended.** The packet frames this as choosing a venue. The venue is
+the smaller half. The org open-license record fixes its criterion as
+OSI-approved or FSF-free and its enforcement as a generated dependency-license
+report along one of two paths, and both paths enumerate software dependencies.
+A schematic, a layout, a footprint library and a BOM are copyrightable works
+that OSI does not review and no dependency report can reach. This project can
+therefore run every gate the org mandates, report zero violations, and publish
+its principal deliverable with no grant on it at all — which under P1 means a
+recipient holding the design cannot modify or redistribute it.
+
+Precedence lets a project *add* constraints to an org record. What is missing
+here is not a constraint but an enforcement mechanism, and a project cannot
+add one to an org record. That is why Q4 does not resolve by picking a venue.
+REUSE plus SPDX headers is the candidate — it is generated rather than
+hand-compiled as the record's clause 4 requires, and it is the only mechanism
+of the three that sees a `.kicad_sch`. The argument is written up in
+`governance/qm/perspectives/2026-08-08-hardware-onramp-invisible-artifacts.md`
+with a proposed org amendment. Do not act on it: a perspective never
+graduates on its own, and this remains a human decision. **Escalate when WP-6
+reaches it; do not settle the record's Status yourself.**
 
 ---
 
@@ -117,11 +179,45 @@ Follow `governance/qm/README.md` § "Forking a new project" verbatim. In short:
 3. Point the submodule at that branch tip; add `branch = project/tessera` to
    `.gitmodules`.
 4. Copy `project-seed/ci/adr-lint.yml` into `.github/workflows/`, unmodified.
+
+   **Amended — an open conflict, not a settled instruction.** The fork
+   procedure's step 4 requires the ADR lint *and* a license gate at
+   instantiation: "a project without both is not instantiated, it is
+   improvised." This packet routes the license gate to WP-6, several work
+   packages later. Both positions are defensible; together they open an
+   interval in which this repository is improvised by the org's own standard,
+   and nothing detects it, because an unwired gate is indistinguishable from a
+   passing one. The interval is currently open. Closing it early costs about
+   forty lines — apothecary's `license-check.yml` is the dependency-manifest
+   precedent and needs only a package to point at, which arrives with WP-1.
+   Whoever picks up WP-1 should either wire it then or say plainly that the
+   gap is being carried.
 5. Copy `project-seed/ide/` recursively onto the repository root **with
-   symlinks preserved** (`cp -a`, `rsync -a`, or `git checkout`). `CLAUDE.md`
-   and `.github/copilot-instructions.md` are real symlinks to `AGENTS.md`, not
-   copies. Fill in setup and test commands below `AGENTS.md`'s marked line; the
-   governance section above it stays verbatim.
+   symlinks preserved**. `CLAUDE.md` and `.github/copilot-instructions.md` are
+   real symlinks to `AGENTS.md`, not copies. Fill in setup and test commands
+   below `AGENTS.md`'s marked line; the governance section above it stays
+   verbatim.
+
+   **Amended, and this one costs a day if you trust the original wording.** The
+   fork procedure lists `cp -a`, `rsync -a` and `git checkout` as
+   interchangeable. On Windows they are not. `cp -a` under MSYS produced a
+   *regular file* for `CLAUDE.md` holding `AGENTS.md`'s content, and failed
+   outright on `.github/copilot-instructions.md`. The regular-file result is
+   the dangerous one: it passes any check shaped like "does `CLAUDE.md` contain
+   the governance text" while breaking the one invariant the symlink exists for
+   — that editing `AGENTS.md` keeps all three current. Write the entries into
+   the index and materialize them, and assert the **mode**, not the content:
+
+   ```bash
+   git update-index --add --cacheinfo 120000,$(printf '%s' 'AGENTS.md'    | git hash-object -w --stdin),CLAUDE.md
+   git update-index --add --cacheinfo 120000,$(printf '%s' '../AGENTS.md' | git hash-object -w --stdin),.github/copilot-instructions.md
+   git checkout -- CLAUDE.md .github/copilot-instructions.md
+   git ls-files -s CLAUDE.md .github/copilot-instructions.md   # must read 120000
+   ```
+
+   The blobs are content-addressed, so correct ones reproduce the seed's own
+   SHAs — `47dc3e3d…` and `be77ac83…`. That equality is the real proof the
+   target paths are right.
 6. Check `.gitignore` for a blanket `.vscode/` rule. If present, replace with
    `.vscode/*` plus `!.vscode/settings.json` and `!.vscode/extensions.json`.
    A blanket rule silently prevents the checked-in workspace config from ever
@@ -132,6 +228,14 @@ Follow `governance/qm/README.md` § "Forking a new project" verbatim. In short:
 **Acceptance:** a fresh clone resolves `CLAUDE.md` to `AGENTS.md` content;
 `adr-lint` passes on all five drafts; `git submodule update --remote` tracks
 `project/tessera`.
+
+**Amended — the first criterion is conditional on Windows.** `core.symlinks`
+is not set globally on the build machine, so a fresh clone materializes both
+symlinks as one-line pointers until the one-time step in `AGENTS.md` runs
+(`git config core.symlinks true` then `git checkout -- .`). That is the
+documented, expected degradation, not a defect: the committed tree is correct
+either way, which is why the mode check above is the criterion that actually
+holds. Verified in both states.
 
 ---
 
@@ -380,3 +484,25 @@ When M1 lands, or when you stop:
   stands on.
 - Any place where this packet and the ADRs disagree. The ADRs win; the packet
   gets fixed.
+
+### Reported so far — WP-0
+
+Recorded here so the next session does not re-report it as new.
+
+- **Assertions green:** none. All six require a payload; WP-0 builds none.
+  WP-0's own three acceptance criteria are green and were checked against a
+  real fresh clone rather than asserted.
+- **Open questions reached:** Q1 and Q4. Q1 was escalated before any
+  outward-facing action; the placeholder is in force and nothing is published
+  under it. Q4 was escalated and found to be larger than the packet framed it
+  — see §2.
+- **Upstream gaps found:** none in ESPHome, apothecary or KiCad, none of which
+  WP-0 touches. Three were found in the QM corpus itself, which is the closest
+  layer of the stack for governance and therefore where they were reported:
+  the fork procedure's symlink-copy guidance is wrong on Windows; the
+  open-license record's enforcement cannot see hardware artifacts; and gate
+  *absence* is undetectable, which the corpus demonstrates on itself by
+  running no CI over its own records. All three are written up as an org-level
+  perspective with proposals, on the branch named in §2. Per the org record,
+  a capability gap closes upstream — that is what the perspective is.
+- **Packet corrections applied:** the four marked **Amended** blocks above.

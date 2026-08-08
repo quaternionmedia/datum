@@ -54,6 +54,11 @@ Read `HANDOFF.md` before starting work, then `PLAN.md`, then the five drafts
 in `governance/qm/adr/`. If `HANDOFF.md` and a decision record disagree, the
 record is right and the packet needs fixing — say so rather than proceeding.
 
+`HANDOFF.md`'s **State on arrival** section is the only part of that file
+execution sessions maintain. It says what is built, what is verified, and
+which work package is next. Read it first; it is shorter than the packet and
+it is the part that goes stale.
+
 ## Setup and test commands
 
 None yet. This repository is at WP-0: governance wiring only, no payload.
