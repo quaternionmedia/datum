@@ -1,0 +1,36 @@
+version = 1
+SPDX-PackageName = "Datum"
+SPDX-PackageSupplier = "Quaternion Media <peter.kagstrom@gmail.com>"
+
+# Licensing follows this project's own record, which the org outbound-licensing
+# record's hardware clause adopts at org level:
+#   governance/qm/adr/DRAFT-hardware-firmware-documentation-licensing.md
+#
+# Only the two classes this repository ships today are declared. Board designs
+# are CERN-OHL-S-2.0 under that record; add LICENSES/CERN-OHL-S-2.0.txt and a
+# block for them when the first schematic lands, not before -- `reuse lint`
+# reports an unused licence text as a finding.
+#
+# Declared here rather than as per-file headers because the JSON schema files
+# have no comment syntax to carry one.
+
+# --- Host software: the schema tooling, tests and packaging (record §2) ------
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Copyright (c) 2026 Quaternion Media"
+SPDX-License-Identifier = "MIT"
+
+# --- Documentation (record §4) ----------------------------------------------
+[[annotations]]
+path = ["**.md", "docs/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "Copyright (c) 2026 Quaternion Media"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+# --- Governance submodule: licensed in its own repository -------------------
+[[annotations]]
+path = "governance/**"
+precedence = "override"
+SPDX-FileCopyrightText = "Copyright (c) 2026 Quaternion Media"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
