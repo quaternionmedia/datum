@@ -67,22 +67,29 @@ uv run pytest                              # run the documentation
 uv run tessera version                     # schema version
 uv run tessera emit                        # JSON Schema -> schema/build/ (never committed)
 uv run tessera validate <file.json>        # an event, or an array of them
+
+# WIRE.md needs a broker. Without one it skips, with a stated reason.
+docker run -d --rm -p 11883:1883 eclipse-mosquitto:2
+TESSERA_BROKER=host:port uv run pytest     # or point at your own
 ```
 
 **`uv run pytest` runs the documentation, and that is not a turn of phrase.**
 `README.md` is the readme, the cookbook, the topic-contract documentation and
-the conformance run, and every `>>>` in it executes. Module docstrings are
-collected too. There is no `tests/` directory and adding one would be a
-regression: it reintroduces the gap between what the docs claim and what the
-code does. Write the example where a reader needs it, and it is a test.
+the conformance run; `WIRE.md` is the same for the broker round-trip. Every
+`>>>` in both executes, and module docstrings are collected too. There is no
+`tests/` directory and adding one would be a regression: it reintroduces the
+gap between what the docs claim and what the code does. Write the example
+where a reader needs it, and it is a test.
 
 The stack is fixed by `governance/qm/records/DRAFT-house-stack.md`: Python,
 Pydantic, Click, pytest, uv. A dependency outside the blessed set needs a
-record before it appears in review — `jsonschema` has one, and it is a
-development dependency imported lazily so the runtime package loads without
-it. The next one you will need is an MQTT client, for WP-2. Select it, draft
-its record, then implement; drafting for an unchosen dependency decides by
-anticipation.
+record before it appears in review. Two exist — `jsonschema` and `paho-mqtt` —
+and both are development dependencies imported lazily inside functions, so the
+runtime package loads without either. A runtime import of either is a review
+failure. Both records name the same underlying reason: a project whose seam is
+a wire protocol needs protocol tooling a web stack never does. A third
+instance of that pattern is worth raising at org level rather than arguing
+from scratch again.
 
 ## Work package order, and it is fixed
 
@@ -90,8 +97,8 @@ anticipation.
 |---|---|---|---|
 | WP-0 | Repository bootstrap | this file, `governance/` | done |
 | WP-1 | The event envelope | `schema/`, `README.md` | done |
-| WP-2 | Topic contract and MQTT harness | `schema/topics.py`, `README.md` | contract done; wire pending an MQTT client record |
-| WP-3 | Firmware, stock ESPHome on ESP32-C6 | `firmware/` | |
+| WP-2 | Topic contract and MQTT harness | `schema/topics.py`, `schema/harness.py`, `WIRE.md` | done |
+| WP-3 | Firmware, stock ESPHome on ESP32-C6 | `firmware/` | next |
 | WP-4 | Hardware, T1-Core, KiCad 9 | `hardware/t1-core/` | |
 | WP-5 | Enclosure | **`quaternionmedia/apothecary`**, not here | |
 | WP-6 | License and REUSE gates | `.github/workflows/` | |

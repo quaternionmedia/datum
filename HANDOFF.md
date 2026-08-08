@@ -20,7 +20,7 @@ place.
 
 ## State on arrival
 
-**WP-0 and WP-1 are complete. The core demo runs. WP-2 is next.** Nothing has
+**WP-0, WP-1 and WP-2 are complete. WP-3 (firmware) is next.** Nothing has
 been pushed: the branches described below exist only on the machine that built
 them.
 
@@ -28,36 +28,53 @@ What exists:
 
 | | |
 |---|---|
-| Project repository | `main`. Governance wiring, the schema package, and the retrofit demo. No firmware, no hardware, no geometry. |
+| Project repository | `main`. Governance wiring, the schema package, the retrofit demo, and the wire harness. No firmware, no hardware, no geometry. |
 | `governance/qm` submodule | Pinned to `project/tessera`. |
-| Decision records | Six, numberless, Status untouched, at `governance/qm/adr/`. |
-| CI | `adr-lint.yml` only, verbatim from the seed. **No license gate, and no workflow runs the test suite yet.** |
+| Decision records | Eight, numberless, at `governance/qm/adr/`. |
+| CI | `adr-lint.yml` (seed, verbatim) and `schema.yml`, which runs the documentation against a Mosquitto service container. **Still no license gate.** |
 
-**Assertions green: 1 and 3 of six.** The emitted JSON Schema accepts all six
-valid vectors and rejects the malformed ones — with one honest correction to
-the packet, below. A v1-pinned consumer parses a capability-extended event and
-yields an identical `action`; that is assertion 3, the one that matters, and
-it is demonstrated inside the demo rather than off in a test file.
+**Assertions green: 1, 2 and 3 of six.**
 
-**Assertion 2 is not green and cannot be yet.** Everything runs in-process.
-The envelope and the topic contract are exercised; MQTT itself is not. The
-wire test needs an MQTT client library, which is outside the blessed
-house-stack set and needs its own record — the same gate `jsonschema` just
-went through. That record is not drafted, because the client has not been
-selected and drafting a record for an unchosen dependency would be deciding by
-anticipation. **Select, then draft, then implement, in that order.**
+1. The emitted JSON Schema accepts all six valid vectors and rejects the
+   malformed ones — with one correction to the packet, below.
+2. A captured firmware event round-trips the documented topic contract over a
+   real broker and validates. Qualified: the captured event is a stand-in
+   written against the contract until WP-3 produces a real capture. Everything
+   else in that path — topic, encoding, retention, schema validation — runs
+   against Mosquitto over a socket.
+3. A v1-pinned consumer parses a capability-extended event and yields an
+   identical `action`. This is the one that matters, and it is demonstrated
+   inside the demo rather than off in a test file.
+
+**What the wire harness caught on its first run, worth knowing before you
+touch retention.** MQTT clears the retain flag when delivering to a
+subscription that was *already established*. A subscriber watching the publish
+happen sees `retain=0` even for a message the broker retained — the flag means
+"this is a stored message replayed to you because you just arrived," not "this
+was published with retention." So retention is only observable to a subscriber
+that joins afterwards, which is exactly the consumer the rule exists for. The
+harness opens a second, late subscriber to check it. An in-process fixture
+models none of this, which is the argument for the harness in one paragraph.
 
 `schema/src/tessera/bus.py` is a test fixture standing in for the broker. It
 must never grow into an MQTT implementation. The broker is an engine.
 
 **The documentation is the test suite.** `README.md` is the readme, the
-cookbook, the topic-contract documentation and the entire conformance run, and
-`pytest` executes every example in it. There is no `tests/` directory and
-there should not be one: a claim that stops being true fails the build instead
-of going stale. Module docstrings are collected too, so there is nowhere to
-write an example that is not checked. This deviates from the packet, which
-asks for `docs/topic-contract.md` and a separate harness directory — the
-deviation is deliberate and was requested.
+cookbook, the topic-contract documentation and the conformance run;
+`WIRE.md` is the same thing for the broker round-trip. `pytest` executes every
+example in both, plus the module docstrings, so there is nowhere to write an
+example that is not checked. There is no `tests/` directory and there should
+not be one: a claim that stops being true fails the build instead of going
+stale. This deviates from the packet, which asks for `docs/topic-contract.md`
+and a separate harness directory — the deviation is deliberate and was
+requested.
+
+`WIRE.md` is split from `README.md` for one reason: it needs a broker.
+Without one it is skipped with a stated reason and everything else still runs.
+An external prerequisite for part of a suite is house-normal — apothecary's
+own tests need the `openscad` CLI and browser binaries — but the skip is
+announced rather than silent, because a skipped assertion 2 reported as a pass
+is the failure mode worth guarding.
 
 **Correction to WP-1's acceptance.** The packet asks for four malformed
 vectors all rejected by the emitted schema. Three are. The fourth,

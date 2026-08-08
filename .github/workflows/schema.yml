@@ -1,0 +1,63 @@
+name: Schema
+
+# Runs the documentation. README.md, WIRE.md and the module docstrings are the
+# whole test suite -- there is no tests/ directory by design, so this job is
+# what stands between a claim in the docs and it quietly becoming false.
+#
+# The broker is a real one. Mosquitto is the reference implementation of the
+# seam protocol; the harness depends on no broker-specific behaviour, so this
+# service could be swapped for EMQX or NanoMQ without touching the tests. That
+# claim is currently enforced by review rather than by CI, since CI runs one
+# broker -- see the MQTT client record's clause 3.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  docs-are-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      broker:
+        image: eclipse-mosquitto:2
+        ports:
+          - 11883:1883
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install
+        run: uv sync --locked
+
+      - name: Confirm the broker is up
+        # If this fails, the wire cookbook would skip rather than fail, and a
+        # skipped assertion 2 reported as a pass is the failure mode worth
+        # spending six lines to prevent.
+        run: |
+          for i in $(seq 1 30); do
+            if (echo > /dev/tcp/127.0.0.1/11883) >/dev/null 2>&1; then
+              echo "broker reachable"; exit 0
+            fi
+            sleep 1
+          done
+          echo "no broker on 11883 after 30s; the wire cookbook would be skipped"; exit 1
+
+      - name: Run the documentation
+        run: uv run pytest -rs
+
+      - name: Emit the JSON Schema artifact
+        run: uv run tessera emit
+
+      - name: Upload the emitted schema
+        uses: actions/upload-artifact@v4
+        with:
+          name: json-schema
+          path: schema/build/

@@ -28,6 +28,19 @@ uv run pytest    # run this file
 Nothing here is a hardware requirement. The demo below runs on a laptop with
 no board attached, no broker installed and no bulb in the room.
 
+**[`WIRE.md`](WIRE.md) is the other half**, and it is also a test suite. It
+proves the same contract over a real MQTT broker, and is skipped with a stated
+reason when there is no broker to prove it against:
+
+```
+docker run -d --rm -p 11883:1883 eclipse-mosquitto:2
+uv run pytest
+```
+
+`Bus` below is an in-process fixture. It must never grow into an MQTT
+implementation — the broker is an engine, and engines get selected, not
+written.
+
 ---
 
 ## The demo: toggle a light that has no switch
@@ -323,14 +336,10 @@ models is a second source of truth.
 Stated plainly, because a README that implies coverage it does not have is
 worse than no README.
 
-- **The wire.** Everything above runs in-process. The envelope and the topic
-  contract are exercised; MQTT itself is not. A real broker round-trip needs an
-  MQTT client library, which is outside the blessed house stack and therefore
-  needs a decision record before it can appear in review. `Bus` is a test
-  fixture and must never grow into an MQTT implementation — the broker is an
-  engine, and engines get selected, not written.
 - **Firmware and hardware.** No ESPHome configuration, no KiCad project. The
-  demo models a T1-Core; it does not flash one.
+  demo models a T1-Core; it does not flash one. The captured firmware event the
+  wire cookbook replays is a stand-in written against the topic contract, and
+  becomes a real capture at WP-3.
 - **The license gate.** Not wired. The org fork procedure wants it at
   instantiation; see `HANDOFF.md` for the open conflict and the decision it is
   waiting on.

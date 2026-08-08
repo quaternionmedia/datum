@@ -15,9 +15,12 @@ tessera = "tessera.cli:cli"
 [dependency-groups]
 dev = [
     "pytest>=8.3",
-    # Outside the blessed house-stack set. Pending
-    # governance/qm/adr/DRAFT-json-schema-validator-for-the-conformance-gate.md.
+    # Both outside the blessed house-stack set, both carrying a record, both
+    # imported lazily so the runtime package loads without them.
+    # governance/qm/adr/DRAFT-json-schema-validator-for-the-conformance-gate.md
     "jsonschema>=4.21",
+    # governance/qm/adr/DRAFT-mqtt-client-for-the-wire-harness.md
+    "paho-mqtt>=2.1",
 ]
 
 [tool.uv]
@@ -36,5 +39,5 @@ packages = ["schema/src/tessera"]
 # build rather than going stale. There is nowhere to write an untested example.
 [tool.pytest.ini_options]
 addopts = "--doctest-glob=*.md --doctest-modules -q"
-testpaths = ["README.md", "schema/src/tessera"]
+testpaths = ["README.md", "WIRE.md", "schema/src/tessera"]
 doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
