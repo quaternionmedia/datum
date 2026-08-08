@@ -1,5 +1,5 @@
 {
-  "src": "tessera/hall/plate",
+  "src": "datum/hall/plate",
   "seq": 42,
   "caps": ["press"],
   "action": "double",

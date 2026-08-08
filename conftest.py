@@ -17,7 +17,7 @@ WIRE_COOKBOOK = "WIRE.md"
 
 
 def pytest_collection_modifyitems(config, items):
-    from tessera.harness import broker_address, broker_reachable
+    from datum.harness import broker_address, broker_reachable
 
     if broker_reachable():
         return
@@ -26,7 +26,7 @@ def pytest_collection_modifyitems(config, items):
     reason = (
         f"no MQTT broker at {host}:{port}: "
         f"start one with `docker run -d --rm -p {port}:1883 eclipse-mosquitto:2`, "
-        f"or set TESSERA_BROKER=host:port"
+        f"or set DATUM_BROKER=host:port"
     )
     skip = pytest.mark.skip(reason=reason)
     for item in items:

@@ -18,16 +18,22 @@ from .envelope import (
 )
 from .retrofit import Contact, Lamp
 from .topics import (
+    ARMED,
+    DETAINED,
     OFFLINE,
     ONLINE,
     TOPIC_ROOT,
     announce_topic,
+    detained_topic,
+    detent_topic,
     event_topic,
     is_retained,
     status_topic,
 )
 
 __all__ = [
+    "ARMED",
+    "DETAINED",
     "OFFLINE",
     "ONLINE",
     "SCHEMA_VERSION",
@@ -43,6 +49,8 @@ __all__ = [
     "announce_json_schema",
     "announce_topic",
     "closed_objects",
+    "detained_topic",
+    "detent_topic",
     "event_json_schema",
     "event_topic",
     "is_monotonic",

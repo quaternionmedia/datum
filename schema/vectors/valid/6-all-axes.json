@@ -1,5 +1,5 @@
 {
-  "src": "tessera/bench/puck",
+  "src": "datum/bench/puck",
   "seq": 2048,
   "caps": ["press", "level", "vec", "color", "batt"],
   "action": "triple",

@@ -1,5 +1,5 @@
 {
-  "src": "tessera/studio/wheel",
+  "src": "datum/studio/wheel",
   "seq": 9,
   "caps": ["press", "color"],
   "action": "single",

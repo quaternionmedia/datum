@@ -54,7 +54,7 @@ jobs:
         run: uv run pytest -rs
 
       - name: Emit the JSON Schema artifact
-        run: uv run tessera emit
+        run: uv run datum emit
 
       - name: Upload the emitted schema
         uses: actions/upload-artifact@v4

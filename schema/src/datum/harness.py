@@ -31,8 +31,8 @@ DEFAULT_BROKER = "127.0.0.1:11883"
 
 
 def broker_address() -> tuple[str, int]:
-    """Broker host and port, from ``TESSERA_BROKER`` or the default."""
-    raw = os.environ.get("TESSERA_BROKER", DEFAULT_BROKER)
+    """Broker host and port, from ``DATUM_BROKER`` or the default."""
+    raw = os.environ.get("DATUM_BROKER", DEFAULT_BROKER)
     host, _, port = raw.partition(":")
     return host or "127.0.0.1", int(port or 1883)
 
@@ -109,7 +109,7 @@ def roundtrip(event: Event, announce: Announce | None = None, timeout: float = 5
     an_topic = announce_topic(event.src)
     st_topic = status_topic(event.src)
 
-    publisher = _client("tessera-harness-pub")
+    publisher = _client("datum-harness-pub")
     publisher.connect(host, port, keepalive=30)
     publisher.loop_start()
 
@@ -118,7 +118,7 @@ def roundtrip(event: Event, announce: Announce | None = None, timeout: float = 5
     _clear_retained(publisher, [an_topic, st_topic], timeout)
 
     live: list[Captured] = []
-    subscriber = _client("tessera-harness-sub")
+    subscriber = _client("datum-harness-sub")
     subscriber.on_message = lambda _c, _u, msg: live.append(
         Captured(msg.topic, msg.payload.decode("utf-8"), bool(msg.retain))
     )
@@ -207,7 +207,7 @@ def _late_subscriber_view(
 ) -> list[Captured]:
     """What a subscriber joining now receives: retained topics only."""
     seen: list[Captured] = []
-    client = _client("tessera-harness-late")
+    client = _client("datum-harness-late")
     client.on_message = lambda _c, _u, msg: seen.append(
         Captured(msg.topic, msg.payload.decode("utf-8"), bool(msg.retain))
     )

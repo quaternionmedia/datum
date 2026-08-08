@@ -42,8 +42,8 @@ has to be checked by one that joins afterwards — which is exactly the consumer
 the retention rules exist for. The harness does both.
 
     >>> import json
-    >>> from tessera import Announce, Event, vectors_dir
-    >>> from tessera.harness import roundtrip
+    >>> from datum import Announce, Event, vectors_dir
+    >>> from datum.harness import roundtrip
 
 A captured firmware event. This one is a stand-in written against the topic
 contract; it becomes a genuinely captured payload when firmware exists at
@@ -55,7 +55,7 @@ WP-3, and the file is the only thing that changes.
     >>> event = Event.model_validate(raw)
     >>> announce = Announce(src=event.src, caps=event.caps, hw="t1-core-r0", fw="0.1.0")
     >>> event.src
-    'tessera/lab/jig'
+    'datum/lab/jig'
 
 Publish the announce, the availability and the event, then read them back:
 
@@ -68,7 +68,7 @@ That single line covers the whole contract. Spelled out:
 **The event arrived on the documented topic, and arrived unchanged.**
 
     >>> result.received.topic
-    'tessera/lab/jig/event'
+    'datum/lab/jig/event'
     >>> result.received.payload == event.wire_json()
     True
 

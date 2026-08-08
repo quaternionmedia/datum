@@ -1,4 +1,4 @@
-# HANDOFF — Tessera, Milestone 1
+# HANDOFF — Datum, Milestone 1
 
 **For:** a coding agent with no prior context on this project.
 **From:** the planning session that produced `PLAN.md` and `adr/`.
@@ -29,7 +29,7 @@ What exists:
 | | |
 |---|---|
 | Project repository | `main`. Governance wiring, the schema package, the retrofit demo, and the wire harness. No firmware, no hardware, no geometry. |
-| `governance/qm` submodule | Pinned to `project/tessera`. |
+| `governance/qm` submodule | Pinned to `project/datum`. |
 | Decision records | Eight, numberless, at `governance/qm/adr/`. |
 | CI | `adr-lint.yml` (seed, verbatim) and `schema.yml`, which runs the documentation against a Mosquitto service container. **Still no license gate.** |
 
@@ -56,7 +56,7 @@ that joins afterwards, which is exactly the consumer the rule exists for. The
 harness opens a second, late subscriber to check it. An in-process fixture
 models none of this, which is the argument for the harness in one paragraph.
 
-`schema/src/tessera/bus.py` is a test fixture standing in for the broker. It
+`schema/src/datum/bus.py` is a test fixture standing in for the broker. It
 must never grow into an MQTT implementation. The broker is an engine.
 
 **The documentation is the test suite.** `README.md` is the readme, the
@@ -82,7 +82,7 @@ non-monotonic `seq`, **cannot be**: monotonicity is a property of a sequence,
 and no single-event JSON Schema can express a relationship between one payload
 and the one before it. Each event in that fixture is individually valid and
 should be. The invariant is real, so it is enforced by a stateful check
-(`is_monotonic`) and by `tessera validate` on an array. Two kinds of
+(`is_monotonic`) and by `datum validate` on an array. Two kinds of
 guarantee, two kinds of gate. The cookbook demonstrates both. Weakening this
 to "four rejected by the schema" would have meant a fabricated test.
 
@@ -95,8 +95,9 @@ exact expression is clean over all six drafts; `git submodule update
 out is human-only contributorship: no `Co-Authored-By:` trailer naming a
 vendor `noreply@` address, even if your tooling appends one by default.
 
-**Open questions have moved.** Q1 is still open and the placeholder is in
-force. Q4 turns out to be larger than a venue preference — see §2.
+**Open questions have moved.** Q1 is settled: the project is **Datum**, and
+the rename is complete across both repositories. Q4 turns out to be larger
+than a venue preference — see §2.
 
 ---
 
@@ -114,7 +115,7 @@ sleep, do not add a power budget, do not treat the indicator LED's quiescent
 draw as a constraint.
 
 **Two repositories.**
-- `quaternionmedia/tessera` (name pending, see §2) — schema, firmware, KiCad,
+- `quaternionmedia/datum` — schema, firmware, KiCad,
   CI, docs.
 - `quaternionmedia/apothecary` — **all** printable geometry, as pull requests.
   No `.scad` files land in the project repository.
@@ -177,18 +178,17 @@ governance violation, not a shortcut.
 
 | # | Question | Blocks |
 |---|---|---|
-| Q1 | **Project name.** "Tessera" is a placeholder. | Repository creation, package name, MQTT topic root, part names |
+| Q1 | ~~**Project name.**~~ **Settled: Datum.** A datum is the fixed reference a machinist or surveyor measures everything else from, and the singular of *data*. Both senses are true of a module whose deliverable is one unit of data from a stable point. | Nothing — the rename is done |
 | Q2 | T4 untethered tier: nRF52840 with a BTHome broadcaster, or ESP32-C6 with deep sleep | Nothing in M1 |
 | Q3 | Zigbee end-device firmware: wait for ESPHome's in-flight support, or ship against esp-zigbee and carry a patch | Nothing in M1 |
 | Q4 | Hardware licensing: **the org corpus has no mechanism that can see a schematic**, so this is not only a venue question — see below | WP-6 can proceed either way; the record's Status cannot be settled |
 | Q5 | Anything requiring USB-C power delivery negotiation | Nothing yet; if you find a reason, that is a finding worth reporting |
 
-**Until Q1 resolves,** use the literal placeholder `tessera` everywhere and
-keep it confined to: the package name, the MQTT topic root constant, and part
-directory names. Do not spread it into prose that would need editing later. It
-currently also names the governance branch and this repository's directory, so
-that the submodule has something to track; neither is published, and neither
-is a naming decision.
+**Q1 is closed.** `datum` is the settled name and is free to appear anywhere:
+the package, the MQTT topic root, part directory names, prose, the governance
+branch (`project/datum`) and the repository. The one thing still carrying the
+old placeholder is this working directory's own name, which is cosmetic and
+resolves when the repository is cloned from its published home.
 
 **On Q4, amended.** The packet frames this as choosing a venue. The venue is
 the smaller half. The org open-license record fixes its criterion as
@@ -227,10 +227,10 @@ rules in.
 Follow `governance/qm/README.md` § "Forking a new project" verbatim. In short:
 
 1. Add `quaternionmedia/qm` as a submodule at `governance/qm`.
-2. Create branch `project/tessera` on the qm repository from `main`. On that
+2. Create branch `project/datum` on the qm repository from `main`. On that
    branch, copy `project-seed/adr/` to a top-level `adr/` (README and TEMPLATE,
    verbatim). Push.
-3. Point the submodule at that branch tip; add `branch = project/tessera` to
+3. Point the submodule at that branch tip; add `branch = project/datum` to
    `.gitmodules`.
 4. Copy `project-seed/ci/adr-lint.yml` into `.github/workflows/`, unmodified.
 
@@ -281,7 +281,7 @@ Follow `governance/qm/README.md` § "Forking a new project" verbatim. In short:
 
 **Acceptance:** a fresh clone resolves `CLAUDE.md` to `AGENTS.md` content;
 `adr-lint` passes on all five drafts; `git submodule update --remote` tracks
-`project/tessera`.
+`project/datum`.
 
 **Amended — the first criterion is conditional on Windows.** `core.symlinks`
 is not set globally on the build machine, so a fresh clone materializes both
@@ -418,7 +418,7 @@ easy to get wrong and expensive to discover:
 - USB ESD array on VBUS, D+ and D-; D+/D- as a 90 Ω differential pair.
 - Board outline ≤ 40 × 40 mm.
 - Libraries vendored or pinned; nothing resolves outside the repository.
-  Project-local `tessera.pretty` and `tessera.kicad_sym` for custom parts.
+  Project-local `datum.pretty` and `datum.kicad_sym` for custom parts.
 - `.gitattributes` marking `.kicad_sch` and `.kicad_pcb` as text.
 - `kibot.yaml` with `preflight: run_erc: true, run_drc: true`, plus outputs for
   gerbers, drill, position file, BOM and PDFs.
@@ -436,7 +436,7 @@ board.
 
 **Path:** `quaternionmedia/apothecary`, not this repository.
 
-**Deliverables:** `tessera-core`, `tessera-cap`, `tessera-mount-desk`, each as
+**Deliverables:** `datum-core`, `datum-cap`, `datum-mount-desk`, each as
 `parts/<name>/<name>.scad` plus `apothecary/projects/parts/<name>.py` with a
 Pydantic `Params`, `category`, `tags`, `description`, `print_settings` and
 `display_rotation`. Follow `parts/README.md` and `docs/parts-authoring.md`
@@ -453,7 +453,7 @@ underscored.
   the switch dome and the USB cutout.
 - Defaults must render something coherent with no knowledge of this project.
 
-**Acceptance (M1 assertion 5):** `apothecary parts info tessera-core` returns
+**Acceptance (M1 assertion 5):** `apothecary parts info datum-core` returns
 the part with non-null bounds; `apothecary parts generate-stl` exits 0;
 apothecary's own test suite passes. In this repository, CI verifies the pinned
 apothecary version renders each part it depends on.
@@ -491,7 +491,7 @@ All six assertions green in CI:
 3. A v1-pinned consumer parses a capability-extended event and yields an
    identical `action`. (WP-1)
 4. KiBot ERC and DRC exit 0; the CC-termination check passes. (WP-4)
-5. `apothecary parts info tessera-core` returns non-null bounds; STL generation
+5. `apothecary parts info datum-core` returns non-null bounds; STL generation
    exits 0. (WP-5)
 6. License and REUSE gates report zero violations; every BOM line has two or
    more sources. (WP-4, WP-6)

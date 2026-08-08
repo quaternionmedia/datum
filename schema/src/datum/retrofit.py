@@ -16,7 +16,17 @@ from __future__ import annotations
 
 from .bus import Bus
 from .envelope import Action, Announce, Event
-from .topics import OFFLINE, ONLINE, announce_topic, event_topic, status_topic
+from .topics import (
+    ARMED,
+    DETAINED,
+    OFFLINE,
+    ONLINE,
+    announce_topic,
+    detained_topic,
+    detent_topic,
+    event_topic,
+    status_topic,
+)
 
 
 class Lamp:
@@ -66,16 +76,39 @@ class Contact:
         self.fw = fw
         self._seq = 0
         self._bus: Bus | None = None
+        self.detent = ARMED
 
     def announce(self) -> Announce:
         """What this module advertises before emitting anything."""
         return Announce(src=self.src, caps=self.caps, hw=self.hw, fw=self.fw)
 
     def attach(self, bus: Bus) -> None:
-        """Come online: publish the retained announce and availability."""
+        """Come online: publish the retained announce, availability and detent."""
         self._bus = bus
         bus.publish(announce_topic(self.src), self.announce().wire_json())
         bus.publish(status_topic(self.src), ONLINE)
+        bus.publish(detent_topic(self.src), self.detent)
+
+    @property
+    def detained(self) -> bool:
+        return self.detent == DETAINED
+
+    def detain(self) -> None:
+        """Put the datum in detention: presses are observed, never acted on.
+
+        For the cat, the toddler, the sleeve that catches the wall plate. The
+        module stays online and keeps reporting; what changes is which topic a
+        press lands on, and therefore who hears it.
+        """
+        self.detent = DETAINED
+        if self._bus is not None:
+            self._bus.publish(detent_topic(self.src), self.detent)
+
+    def arm(self) -> None:
+        """Let it out. Presses go back to the event topic."""
+        self.detent = ARMED
+        if self._bus is not None:
+            self._bus.publish(detent_topic(self.src), self.detent)
 
     def detach(self) -> None:
         """Go offline. Stands in for the broker's last-will on an ungraceful drop."""
@@ -84,7 +117,15 @@ class Contact:
             self._bus = None
 
     def emit(self, action: Action | str, **axes: object) -> Event:
-        """Build the next event, publish it if attached, and return it."""
+        """Build the next event, publish it if attached, and return it.
+
+        While detained the event is published to the detained topic instead of
+        the event topic. The suppression is in the routing, never in the
+        payload: an ignore-me field would be ignored by every consumer written
+        before that field existed, which is precisely the set that must honour
+        it. ``seq`` still advances, because a gap in the sequence would look
+        like packet loss to a consumer counting them.
+        """
         self._seq += 1
         event = Event(
             src=self.src,
@@ -95,7 +136,8 @@ class Contact:
             **axes,  # type: ignore[arg-type]
         )
         if self._bus is not None:
-            self._bus.publish(event_topic(self.src), event.wire_json())
+            topic = detained_topic(self.src) if self.detained else event_topic(self.src)
+            self._bus.publish(topic, event.wire_json())
         return event
 
     def press(self) -> Event:

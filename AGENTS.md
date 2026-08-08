@@ -64,13 +64,13 @@ it is the part that goes stale.
 ```bash
 uv sync                                    # install
 uv run pytest                              # run the documentation
-uv run tessera version                     # schema version
-uv run tessera emit                        # JSON Schema -> schema/build/ (never committed)
-uv run tessera validate <file.json>        # an event, or an array of them
+uv run datum version                     # schema version
+uv run datum emit                        # JSON Schema -> schema/build/ (never committed)
+uv run datum validate <file.json>        # an event, or an array of them
 
 # WIRE.md needs a broker. Without one it skips, with a stated reason.
 docker run -d --rm -p 11883:1883 eclipse-mosquitto:2
-TESSERA_BROKER=host:port uv run pytest     # or point at your own
+DATUM_BROKER=host:port uv run pytest     # or point at your own
 ```
 
 **`uv run pytest` runs the documentation, and that is not a turn of phrase.**
@@ -128,10 +128,11 @@ carries the full list with reasons; the ones that bite first:
 `HANDOFF.md` §2 holds the table. Reaching one of these means stopping and
 asking; deciding one by stealth is a governance violation, not a shortcut.
 
-The one you will meet first: **the project name is unsettled.** Use the
-literal placeholder `tessera`, confined to the package name, the MQTT topic
-root constant, and part directory names. Keep it out of prose that would need
-editing later.
+The naming question that used to head this list is settled: the project is
+**Datum**, and the name is free to appear anywhere. What remains open is Q4
+(hardware licensing, which is a missing org mechanism rather than a venue
+choice) and whether a controller may set a module's detent remotely, which
+would add the first inbound path to an otherwise outbound contract.
 
 ## Definition of done for Milestone 1
 

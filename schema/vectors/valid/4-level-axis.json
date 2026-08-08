@@ -1,5 +1,5 @@
 {
-  "src": "tessera/studio/dimmer",
+  "src": "datum/studio/dimmer",
   "seq": 118,
   "caps": ["press", "level"],
   "action": "single",

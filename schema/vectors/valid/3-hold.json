@@ -1,5 +1,5 @@
 {
-  "src": "tessera/desk/left",
+  "src": "datum/desk/left",
   "seq": 7,
   "caps": ["press"],
   "action": "hold",

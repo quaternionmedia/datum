@@ -1,5 +1,5 @@
 {
-  "src": "tessera/kitchen/north",
+  "src": "datum/kitchen/north",
   "seq": 4,
   "caps": ["press"],
   "action": "long-press",

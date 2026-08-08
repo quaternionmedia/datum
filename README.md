@@ -49,8 +49,8 @@ You have a smart pendant in the kitchen. It has no physical control, so the
 only way to turn it on is an app. Wire a dumb momentary switch — two wires
 into a screw terminal — and give it an identity.
 
-    >>> from tessera import Bus, Contact, Lamp
-    >>> from tessera import announce_topic, event_topic, status_topic
+    >>> from datum import Bus, Contact, Lamp
+    >>> from datum import announce_topic, event_topic, status_topic
 
     >>> lamp = Lamp("kitchen pendant")
     >>> lamp
@@ -63,7 +63,7 @@ builds is `Contact`: the dry contact, and the module that debounces it and
 emits the envelope.
 
     >>> bus = Bus()
-    >>> button = Contact("tessera/kitchen/north")
+    >>> button = Contact("datum/kitchen/north")
     >>> button.attach(bus)
 
 Now subscribe the lamp to the button's event topic and press it.
@@ -88,7 +88,7 @@ axis and a grip object — fields this schema does not define and nobody has
 thought of yet. The lamp's consumer is the one written today, pinned to v1.
 
     >>> from_2031 = '''{
-    ...   "src": "tessera/kitchen/north", "seq": 3,
+    ...   "src": "datum/kitchen/north", "seq": 3,
     ...   "caps": ["press", "level", "torque", "grip"],
     ...   "action": "single", "ch": 0,
     ...   "level": 0.5,
@@ -106,11 +106,72 @@ This is the one assertion that matters. Everything else in this repository is
 hygiene. If it is ever tempting to weaken this to make a test pass, that is
 the project failing, not the test.
 
+### Putting the datum in detention
+
+A detent is the position a mechanism rests in. This one has two: **armed**,
+accepting input, and **detained**, ignoring it. Detention is for the cat, the
+toddler, and the sleeve that catches the wall plate.
+
+Detention suppresses *actuation*, not *observation*. The press still happened,
+and a system that silently discards it makes "why did nothing happen"
+unanswerable — so detained presses go somewhere, just not where the lamp is
+listening.
+
+    >>> from datum import detained_topic, detent_topic
+    >>> cat_log = []
+    >>> bus.subscribe(detained_topic(button.src), cat_log.append)
+
+    >>> button.detain()
+    >>> bus.retained[detent_topic(button.src)]
+    'detained'
+
+Now press it twice. The lamp does not move:
+
+    >>> _ = button.press(); _ = button.press()
+    >>> lamp
+    <kitchen pendant: on>
+
+But the presses are not lost. Both are on the record:
+
+    >>> len(cat_log)
+    2
+
+Let it out, and the button works again:
+
+    >>> button.arm()
+    >>> _ = button.press()
+    >>> lamp
+    <kitchen pendant: off>
+
+`seq` keeps advancing through detention rather than pausing. A gap in the
+sequence is how a consumer detects packet loss, so a detained module that
+skipped numbers would look like a failing radio:
+
+    >>> import json
+    >>> [json.loads(payload)["seq"] for payload in cat_log]
+    [3, 4]
+
+#### Why this is a topic and not a field
+
+The obvious design is an optional `"detained": true` on the event. It cannot
+work, and the reason is this project's own compatibility rule.
+
+Consumers ignore fields they do not recognise. That is the forward-compatibility
+mechanism, it is absolute, and it is what the 2031 demo above depends on. So a
+suppression flag added to the payload would be ignored by exactly the consumers
+that most need to honour it — every one written before the flag existed. They
+would read the `action`, ignore the field, and toggle the light. The cat wins.
+
+A semantic that means "do not act on this" cannot be carried additively in a
+payload whose readers are guaranteed to discard what they do not understand.
+Routing the press to a different topic makes every existing consumer correct by
+construction, because it never receives the message at all.
+
 ---
 
 ## The envelope
 
-    >>> from tessera import Action, Color, Event, SCHEMA_VERSION
+    >>> from datum import Action, Color, Event, SCHEMA_VERSION
     >>> SCHEMA_VERSION
     '1.0.0'
 
@@ -121,12 +182,12 @@ this module can ever emit, so a consumer can render an interface before seeing
 a rich event.
 
     >>> event = Event(
-    ...     src="tessera/kitchen/north", seq=1, caps=["press"], action="single"
+    ...     src="datum/kitchen/north", seq=1, caps=["press"], action="single"
     ... )
     >>> event.action.value
     'single'
     >>> print(event.wire_json())
-    {"src":"tessera/kitchen/north","seq":1,"caps":["press"],"action":"single","ch":0}
+    {"src":"datum/kitchen/north","seq":1,"caps":["press"],"action":"single","ch":0}
 
 Note what is *missing* from that payload: no `level`, no `color`, no `batt`.
 Optional axes are **absent when unused, never null**. A null would claim the
@@ -142,7 +203,7 @@ difference between these two key lists is the capability ladder — same
 envelope, same consumer, more fields:
 
     >>> full = Event(
-    ...     src="tessera/bench/puck", seq=2048,
+    ...     src="datum/bench/puck", seq=2048,
     ...     caps=["press", "level", "vec", "color", "batt"],
     ...     action=Action.TRIPLE, ch=2,
     ...     level=1.0, vec=(0.1, -0.4, 0.9),
@@ -164,7 +225,7 @@ under an upgrade without anyone deciding to change it.
 It has to survive the trip out of Python, because a consumer in another
 language holds the emitted JSON Schema and nothing else:
 
-    >>> from tessera import announce_json_schema, closed_objects, event_json_schema
+    >>> from datum import announce_json_schema, closed_objects, event_json_schema
     >>> schema = event_json_schema()
     >>> sorted(schema["required"])
     ['action', 'caps', 'seq', 'src']
@@ -194,7 +255,7 @@ late knows what the device is without waiting for someone to press it.
     >>> print(json.dumps(button.announce().wire(), indent=2))
     {
       "schema_version": "1.0.0",
-      "src": "tessera/kitchen/north",
+      "src": "datum/kitchen/north",
       "caps": [
         "press"
       ],
@@ -219,12 +280,12 @@ convenience layered over it, never the contract itself.
 | `<src>/announce` | yes | one `Announce` |
 | `<src>/status` | yes | `online` / `offline` |
 
-    >>> event_topic("tessera/kitchen/north")
-    'tessera/kitchen/north/event'
-    >>> announce_topic("tessera/kitchen/north")
-    'tessera/kitchen/north/announce'
-    >>> status_topic("tessera/kitchen/north")
-    'tessera/kitchen/north/status'
+    >>> event_topic("datum/kitchen/north")
+    'datum/kitchen/north/event'
+    >>> announce_topic("datum/kitchen/north")
+    'datum/kitchen/north/announce'
+    >>> status_topic("datum/kitchen/north")
+    'datum/kitchen/north/status'
 
 **Why announce and status are retained.** A consumer that subscribes after the
 device booted still learns the device exists and what it can emit. Without
@@ -258,7 +319,7 @@ have.
 
 Six valid, spanning press-only through every-axis-populated:
 
-    >>> from tessera import report
+    >>> from datum import report
     >>> for line in report("valid"):
     ...     print(line)
     1-press-only: accepted
@@ -286,7 +347,7 @@ payload and the one before it. Each event in that fixture is individually
 valid, and should be:
 
     >>> import json
-    >>> from tessera import accepts, is_monotonic, vectors_dir
+    >>> from datum import accepts, is_monotonic, vectors_dir
     >>> raw = json.loads(
     ...     (vectors_dir() / "invalid" / "4-seq-not-monotonic.json").read_text()
     ... )
@@ -306,7 +367,7 @@ would have meant either a weaker claim or a fabricated test.
 ## The CLI
 
     >>> from click.testing import CliRunner
-    >>> from tessera.cli import cli
+    >>> from datum.cli import cli
     >>> run = CliRunner()
 
     >>> print(run.invoke(cli, ["version"]).output.strip())
@@ -325,7 +386,7 @@ when given an array:
     >>> bad.exit_code
     1
 
-`tessera emit` writes the JSON Schema to `schema/build/`. That output is a
+`datum emit` writes the JSON Schema to `schema/build/`. That output is a
 build artifact and is never committed: a schema in git that can drift from the
 models is a second source of truth.
 
@@ -345,8 +406,9 @@ worse than no README.
   waiting on.
 - **Enclosure.** All printable geometry lives in `quaternionmedia/apothecary`,
   never here. There are no `.scad` files in this repository by design.
-- **The name.** `tessera` is a placeholder, confined to the package name, the
-  topic root constant and part directory names.
+- **Remote detention.** A module can be detained locally; nothing can detain
+  it from a phone yet. That needs an inbound path the contract does not have,
+  and it has its own open decision rather than a missing implementation.
 
 Projection contracts for the other transports are stubbed at
 `schema/projections/README.md`: which axes each can carry, and which it drops.
