@@ -151,16 +151,26 @@ under an upgrade without anyone deciding to change it.
 It has to survive the trip out of Python, because a consumer in another
 language holds the emitted JSON Schema and nothing else:
 
-    >>> from tessera import event_json_schema
+    >>> from tessera import announce_json_schema, closed_objects, event_json_schema
     >>> schema = event_json_schema()
-    >>> "additionalProperties" in schema
-    False
     >>> sorted(schema["required"])
     ['action', 'caps', 'seq', 'src']
 
 The absence of `additionalProperties: false` is the forward-compatibility rule
 reaching the artifact. If it ever appears there, every consumer written today
 starts rejecting tomorrow's modules, and the generational claim is gone.
+
+Checking the top level is not enough — a nested object closed by a
+serialization default breaks the guarantee just as completely, and less
+visibly. Both emitted schemas are checked all the way down:
+
+    >>> closed_objects(schema)
+    []
+    >>> closed_objects(announce_json_schema())
+    []
+
+The event schema has nested definitions for `Action` and `Color`, so that
+check has something to find and finds nothing.
 
 ### Announce
 

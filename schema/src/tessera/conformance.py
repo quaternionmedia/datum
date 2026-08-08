@@ -45,6 +45,29 @@ def accepts(data: Any, schema: dict[str, Any] | None = None) -> bool:
     return validator.is_valid(data)
 
 
+def closed_objects(node: Any, path: str = "root") -> list[str]:
+    """Every place the schema closes an object with ``additionalProperties: false``.
+
+    Must always be empty, at the top level and on every nested object. The
+    ignore-unknown-fields rule is a property of the models in one language and
+    a property of the *artifact* in every other, and a consumer written
+    elsewhere holds only the artifact. A closed object makes every consumer
+    built against this schema reject the next generation of modules — the
+    exact failure the envelope exists to prevent, arriving through a
+    serialization default rather than through a decision.
+    """
+    found: list[str] = []
+    if isinstance(node, dict):
+        if node.get("additionalProperties") is False:
+            found.append(path)
+        for key, value in node.items():
+            found += closed_objects(value, f"{path}.{key}")
+    elif isinstance(node, list):
+        for index, value in enumerate(node):
+            found += closed_objects(value, f"{path}[{index}]")
+    return found
+
+
 def report(kind: str) -> list[str]:
     """One line per vector: its name and whether the schema accepted it."""
     schema = event_json_schema()

@@ -5,7 +5,7 @@ replaceable around it; a consumer written against this envelope is not.
 """
 
 from .bus import Bus
-from .conformance import accepts, load, report, vectors_dir
+from .conformance import accepts, closed_objects, load, report, vectors_dir
 from .envelope import (
     SCHEMA_VERSION,
     Action,
@@ -42,6 +42,7 @@ __all__ = [
     "accepts",
     "announce_json_schema",
     "announce_topic",
+    "closed_objects",
     "event_json_schema",
     "event_topic",
     "is_monotonic",
