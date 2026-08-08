@@ -20,9 +20,8 @@ place.
 
 ## State on arrival
 
-**WP-0, WP-1 and WP-2 are complete. WP-3 (firmware) is next.** Nothing has
-been pushed: the branches described below exist only on the machine that built
-them.
+**WP-0, WP-1 and WP-2 are complete. WP-3 (firmware) is next.** `main` is
+pushed and is the published state; work reaches it as pull requests.
 
 What exists:
 
@@ -30,8 +29,9 @@ What exists:
 |---|---|
 | Project repository | `main`. Governance wiring, the schema package, the retrofit demo, and the wire harness. No firmware, no hardware, no geometry. |
 | `governance/qm` submodule | Pinned to `project/datum`. |
-| Decision records | Eight, numberless, at `governance/qm/adr/`. |
-| CI | `adr-lint.yml` (seed, verbatim) and `schema.yml`, which runs the documentation against a Mosquitto service container. **Still no license gate.** |
+| Decision records | Nine, numberless, at `governance/qm/adr/`. None is an adoption record. |
+| CI | `adr-lint.yml`, `reuse-lint.yml` and `submodule-check.yml` (seed, verbatim), plus `schema.yml`, which runs the documentation against a Mosquitto service container. |
+| Licensing | `LICENSE`, `LICENSES/` and `REUSE.toml` are in place and `reuse lint` is clean. **The dependency-manifest licence gate WP-6 owes is still unwired** — the REUSE gate is one of the two the org record asks for, not both. |
 
 **Assertions green: 1, 2 and 3 of six.**
 
@@ -91,9 +91,11 @@ Verified against a real fresh clone, not asserted: `CLAUDE.md` and
 exact expression is clean over all six drafts; `git submodule update
 --remote` lands on the branch tip with no drift.
 
-**Before your first commit,** read `AGENTS.md`. The rule that will catch you
-out is human-only contributorship: no `Co-Authored-By:` trailer naming a
-vendor `noreply@` address, even if your tooling appends one by default.
+**Before your first commit,** read `AGENTS.md`. Two rules there will catch you
+out. Human-only contributorship: no `Co-Authored-By:` trailer naming a vendor
+`noreply@` address, even if your tooling appends one by default. And delivery
+is always a pull request — work on a branch, open a PR, and never merge your
+own work, in this repo or in the submodule, however mechanical the change.
 
 **Open questions have moved.** Q1 is settled: the project is **Datum**, and
 the rename is complete across both repositories. Q4 turns out to be larger
