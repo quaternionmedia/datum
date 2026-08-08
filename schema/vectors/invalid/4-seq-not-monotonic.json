@@ -1,0 +1,5 @@
+[
+  { "src": "tessera/kitchen/north", "seq": 11, "caps": ["press"], "action": "single", "ch": 0 },
+  { "src": "tessera/kitchen/north", "seq": 12, "caps": ["press"], "action": "single", "ch": 0 },
+  { "src": "tessera/kitchen/north", "seq": 9,  "caps": ["press"], "action": "single", "ch": 0 }
+]

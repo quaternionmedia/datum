@@ -1,0 +1,7 @@
+{
+  "src": "tessera/kitchen/north",
+  "seq": 1,
+  "caps": ["press"],
+  "action": "single",
+  "ch": 0
+}

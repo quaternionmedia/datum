@@ -1,0 +1,8 @@
+{
+  "src": "tessera/studio/dimmer",
+  "seq": 118,
+  "caps": ["press", "level"],
+  "action": "single",
+  "ch": 0,
+  "level": 0.62
+}

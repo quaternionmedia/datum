@@ -1,0 +1,7 @@
+{
+  "src": "tessera/hall/plate",
+  "seq": 42,
+  "caps": ["press"],
+  "action": "double",
+  "ch": 3
+}

@@ -1,0 +1,7 @@
+{
+  "src": "tessera/desk/left",
+  "seq": 7,
+  "caps": ["press"],
+  "action": "hold",
+  "ch": 0
+}

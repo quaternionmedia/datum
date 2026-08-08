@@ -1,0 +1,11 @@
+{
+  "src": "tessera/bench/puck",
+  "seq": 2048,
+  "caps": ["press", "level", "vec", "color", "batt"],
+  "action": "triple",
+  "ch": 2,
+  "level": 1.0,
+  "vec": [0.1, -0.4, 0.9],
+  "color": { "h": 359.9, "s": 0.0 },
+  "batt": 87
+}

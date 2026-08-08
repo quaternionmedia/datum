@@ -1,0 +1,8 @@
+{
+  "src": "tessera/studio/wheel",
+  "seq": 9,
+  "caps": ["press", "color"],
+  "action": "single",
+  "ch": 1,
+  "color": { "h": 210.0, "s": 0.8 }
+}

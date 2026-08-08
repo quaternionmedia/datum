@@ -20,21 +20,58 @@ place.
 
 ## State on arrival
 
-**WP-0 is complete and verified. WP-1 is next.** Nothing has been pushed:
-both git branches described below exist only on the machine that built them.
+**WP-0 and WP-1 are complete. The core demo runs. WP-2 is next.** Nothing has
+been pushed: the branches described below exist only on the machine that built
+them.
 
 What exists:
 
 | | |
 |---|---|
-| Project repository | `main` at one commit. Governance wiring only — no schema, firmware, hardware or geometry. |
-| `governance/qm` submodule | Pinned to `project/tessera` at that branch's tip, cut from qm `main`. |
-| Decision records | Five, numberless, Status untouched, at `governance/qm/adr/`. |
-| CI | `adr-lint.yml` only, verbatim from the seed. **No license gate** — see the correction in WP-0 below. |
+| Project repository | `main`. Governance wiring, the schema package, and the retrofit demo. No firmware, no hardware, no geometry. |
+| `governance/qm` submodule | Pinned to `project/tessera`. |
+| Decision records | Six, numberless, Status untouched, at `governance/qm/adr/`. |
+| CI | `adr-lint.yml` only, verbatim from the seed. **No license gate, and no workflow runs the test suite yet.** |
+
+**Assertions green: 1 and 3 of six.** The emitted JSON Schema accepts all six
+valid vectors and rejects the malformed ones — with one honest correction to
+the packet, below. A v1-pinned consumer parses a capability-extended event and
+yields an identical `action`; that is assertion 3, the one that matters, and
+it is demonstrated inside the demo rather than off in a test file.
+
+**Assertion 2 is not green and cannot be yet.** Everything runs in-process.
+The envelope and the topic contract are exercised; MQTT itself is not. The
+wire test needs an MQTT client library, which is outside the blessed
+house-stack set and needs its own record — the same gate `jsonschema` just
+went through. That record is not drafted, because the client has not been
+selected and drafting a record for an unchosen dependency would be deciding by
+anticipation. **Select, then draft, then implement, in that order.**
+
+`schema/src/tessera/bus.py` is a test fixture standing in for the broker. It
+must never grow into an MQTT implementation. The broker is an engine.
+
+**The documentation is the test suite.** `README.md` is the readme, the
+cookbook, the topic-contract documentation and the entire conformance run, and
+`pytest` executes every example in it. There is no `tests/` directory and
+there should not be one: a claim that stops being true fails the build instead
+of going stale. Module docstrings are collected too, so there is nowhere to
+write an example that is not checked. This deviates from the packet, which
+asks for `docs/topic-contract.md` and a separate harness directory — the
+deviation is deliberate and was requested.
+
+**Correction to WP-1's acceptance.** The packet asks for four malformed
+vectors all rejected by the emitted schema. Three are. The fourth,
+non-monotonic `seq`, **cannot be**: monotonicity is a property of a sequence,
+and no single-event JSON Schema can express a relationship between one payload
+and the one before it. Each event in that fixture is individually valid and
+should be. The invariant is real, so it is enforced by a stateful check
+(`is_monotonic`) and by `tessera validate` on an array. Two kinds of
+guarantee, two kinds of gate. The cookbook demonstrates both. Weakening this
+to "four rejected by the schema" would have meant a fabricated test.
 
 Verified against a real fresh clone, not asserted: `CLAUDE.md` and
 `.github/copilot-instructions.md` resolve to `AGENTS.md` in full; the lint's
-exact expression is clean over all five drafts; `git submodule update
+exact expression is clean over all six drafts; `git submodule update
 --remote` lands on the branch tip with no drift.
 
 **Before your first commit,** read `AGENTS.md`. The rule that will catch you
