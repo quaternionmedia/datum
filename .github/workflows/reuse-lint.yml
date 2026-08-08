@@ -1,18 +1,24 @@
 name: REUSE lint
 
+# SEED FILE: copy verbatim into a forking project's .github/workflows/.
+#
 # The outbound-licensing record's enforcement clause. Checks that every file
-# in this repository carries copyright and licence information, that every
-# licence referenced has its text in LICENSES/, and that no licence text sits
-# there unused.
+# carries copyright and licence information, that every licence referenced has
+# its text in LICENSES/, and that no licence text sits there unused.
 #
-# This gate is deliberately independent of runtime shape: it works identically
-# for a corpus of prose, a Python service, and a single-file HTML deliverable,
-# which is what the open-license record's SBOM path cannot do.
+# Self-contained, like submodule-check.yml and unlike adr-lint.yml: `reuse` is
+# a published tool, so there is nothing project-specific to run from the
+# governance submodule.
 #
-# Licensing here is declared in REUSE.toml rather than as per-file headers,
-# because most of this repository is prose whose opening lines are
-# load-bearing -- and because the symlink pointer files cannot carry a header
-# at all.
+# Deliberately runtime-shape independent. It works identically for a corpus of
+# prose, a Python service, a single-file HTML deliverable and a hardware
+# repository -- which is what the open-license record's SBOM path cannot do,
+# and the gap the qmetronome onramp retrospective named.
+#
+# Start in reporting mode. A repository that has not had its licensing pass
+# will fail this immediately and usefully; make it blocking once it is green,
+# and say in the project's adoption record which date that happened.
+# To report without blocking, add:  continue-on-error: true  to the lint step.
 
 on:
   push:
