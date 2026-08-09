@@ -39,5 +39,5 @@ packages = ["schema/src/datum"]
 # build rather than going stale. There is nowhere to write an untested example.
 [tool.pytest.ini_options]
 addopts = "--doctest-glob=*.md --doctest-modules -q"
-testpaths = ["README.md", "WIRE.md", "schema/src/datum"]
+testpaths = ["README.md", "docs", "schema/src/datum"]
 doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]

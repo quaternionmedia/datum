@@ -1,9 +1,8 @@
 """Collection gate for the wire cookbook.
 
-`WIRE.md` documents behaviour that only exists over a real broker. Without one
-it is skipped with a stated reason rather than failing, and rather than being
-quietly dropped — a silently skipped test is worse than an absent one, so this
-reports what did not run and how to run it.
+`docs/wire.md` documents behaviour that only exists over a real broker. Without
+one it is skipped with a stated reason rather than failing or being dropped
+silently.
 
 `collect_ignore` is not used: entries in `testpaths` are treated like explicit
 command-line arguments, and explicit arguments bypass it.
@@ -13,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-WIRE_COOKBOOK = "WIRE.md"
+WIRE_COOKBOOK = "wire.md"
 
 
 def pytest_collection_modifyitems(config, items):

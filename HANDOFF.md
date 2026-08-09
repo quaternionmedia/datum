@@ -59,17 +59,20 @@ models none of this, which is the argument for the harness in one paragraph.
 `schema/src/datum/bus.py` is a test fixture standing in for the broker. It
 must never grow into an MQTT implementation. The broker is an engine.
 
-**The documentation is the test suite.** `README.md` is the readme, the
-cookbook, the topic-contract documentation and the conformance run;
-`WIRE.md` is the same thing for the broker round-trip. `pytest` executes every
-example in both, plus the module docstrings, so there is nowhere to write an
-example that is not checked. There is no `tests/` directory and there should
-not be one: a claim that stops being true fails the build instead of going
-stale. This deviates from the packet, which asks for `docs/topic-contract.md`
-and a separate harness directory — the deviation is deliberate and was
-requested.
+**The documentation is the test suite.** `pytest` executes every example under
+`docs/`, plus the module docstrings, so there is nowhere to write an example
+that is not checked. There is no `tests/` directory and there should not be
+one: a claim that stops being true fails the build instead of going stale.
 
-`WIRE.md` is split from `README.md` for one reason: it needs a broker.
+**Amended — the packet's `docs/topic-contract.md` is what exists.** The packet
+asks for `docs/topic-contract.md` and a separate harness directory. An earlier
+arrangement put all of it in `README.md` instead. It is now split the way the
+packet asked: `README.md` is a shallow onramp and table of contents, and
+`docs/` carries the executable reference — `cookbook.md`, `envelope.md`,
+`topic-contract.md`, `conformance.md`, `cli.md`, `wire.md`. Both remain tests;
+`governance/qm/handbook/style-guide.md` is the rule that settled it.
+
+`docs/wire.md` is separate from the rest for one reason: it needs a broker.
 Without one it is skipped with a stated reason and everything else still runs.
 An external prerequisite for part of a suite is house-normal — apothecary's
 own tests need the `openscad` CLI and browser binaries — but the skip is
