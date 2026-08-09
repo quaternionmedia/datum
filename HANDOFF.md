@@ -1,20 +1,20 @@
 # HANDOFF — Datum, Milestone 1
 
 **For:** a coding agent with no prior context on this project.
-**From:** the planning session that produced `PLAN.md` and `adr/`.
-**Date:** 2026-08-08.
+**Date:** 2026-08-09.
 
-This packet is self-contained. It does not assume you can see the conversation
-that produced it. Read this file, then `PLAN.md`, then the drafts in
-`governance/qm/adr/`, then start at the work package **State on arrival**
-names as next. If this packet and any other source disagree, this packet is
-wrong and the ADRs are right — say so rather than proceeding.
+This packet is self-contained. It does not assume you can see any conversation.
+Read this file, then `PLAN.md`, then the drafts in `governance/qm/adr/`, then
+start at the work package **State on arrival** names as next. If this packet
+and a decision record disagree, the record is right and this packet needs
+fixing — say so rather than proceeding.
 
 **State on arrival** is unnumbered on purpose: it is maintained by execution
-sessions and is the only part of this file that changes as work lands.
-Everything from §0 down is the planning session's packet, amended only where
-§6's report-back obligation found it wrong; those amendments are marked in
-place.
+sessions and is the part that changes as work lands. Everything from §0 down
+is the standing brief, rewritten in place when a position changes rather than
+annotated — this project's records are pre-ratification, and pre-ratification
+documents carry no memory (`governance/qm/records/DRAFT-decision-record-discipline.md`,
+clause 2).
 
 ---
 
@@ -35,8 +35,9 @@ What exists:
 
 **Assertions green: 1, 2 and 3 of six.**
 
-1. The emitted JSON Schema accepts all six valid vectors and rejects the
-   malformed ones — with one correction to the packet, below.
+1. The emitted JSON Schema accepts all six valid vectors and rejects the three
+   malformed ones a single-event schema can reach. The fourth takes a stateful
+   gate; see below.
 2. A captured firmware event round-trips the documented topic contract over a
    real broker and validates. Qualified: the captured event is a stand-in
    written against the contract until WP-3 produces a real capture. Everything
@@ -64,13 +65,13 @@ must never grow into an MQTT implementation. The broker is an engine.
 that is not checked. There is no `tests/` directory and there should not be
 one: a claim that stops being true fails the build instead of going stale.
 
-**Amended — the packet's `docs/topic-contract.md` is what exists.** The packet
-asks for `docs/topic-contract.md` and a separate harness directory. An earlier
-arrangement put all of it in `README.md` instead. It is now split the way the
-packet asked: `README.md` is a shallow onramp and table of contents, and
-`docs/` carries the executable reference — `cookbook.md`, `envelope.md`,
-`topic-contract.md`, `conformance.md`, `cli.md`, `wire.md`. Both remain tests;
-`governance/qm/handbook/style-guide.md` is the rule that settled it.
+`README.md` is a shallow onramp and a table of contents. `docs/` carries the
+executable reference: `cookbook.md`, `envelope.md`, `topic-contract.md`,
+`conformance.md`, `cli.md`, `wire.md`. Every one of them is a test.
+`governance/qm/handbook/style-guide.md` is the rule that puts them there, and
+the same rule keeps explanation out of them — inline comments carry clarifying
+facts, `docs/` carries the contract, and a why belongs in a record or a
+retrospective.
 
 `docs/wire.md` is separate from the rest for one reason: it needs a broker.
 Without one it is skipped with a stated reason and everything else still runs.
@@ -79,30 +80,25 @@ own tests need the `openscad` CLI and browser binaries — but the skip is
 announced rather than silent, because a skipped assertion 2 reported as a pass
 is the failure mode worth guarding.
 
-**Correction to WP-1's acceptance.** The packet asks for four malformed
-vectors all rejected by the emitted schema. Three are. The fourth,
-non-monotonic `seq`, **cannot be**: monotonicity is a property of a sequence,
-and no single-event JSON Schema can express a relationship between one payload
-and the one before it. Each event in that fixture is individually valid and
-should be. The invariant is real, so it is enforced by a stateful check
-(`is_monotonic`) and by `datum validate` on an array. Two kinds of
-guarantee, two kinds of gate. The cookbook demonstrates both. Weakening this
-to "four rejected by the schema" would have meant a fabricated test.
+**Three malformed vectors are schema-rejectable, and the fourth is not.**
+Non-monotonic `seq` cannot be: monotonicity is a property of a sequence, and no
+single-event JSON Schema can express a relationship between one payload and the
+one before it. Each event in that fixture is individually valid and should be.
+The invariant is real, so it is enforced by a stateful check (`is_monotonic`)
+and by `datum validate` on an array. Two kinds of guarantee, two kinds of gate,
+both demonstrated in `docs/conformance.md`. A schema asserted to reject all
+four would be a fabricated test.
 
 Verified against a real fresh clone, not asserted: `CLAUDE.md` and
-`.github/copilot-instructions.md` resolve to `AGENTS.md` in full; the lint's
-exact expression is clean over all six drafts; `git submodule update
---remote` lands on the branch tip with no drift.
+`.github/copilot-instructions.md` resolve to `AGENTS.md` in full; the ADR lint
+is clean over all nine drafts; `git submodule update --remote` lands on the
+branch tip with no drift.
 
 **Before your first commit,** read `AGENTS.md`. Two rules there will catch you
 out. Human-only contributorship: no `Co-Authored-By:` trailer naming a vendor
 `noreply@` address, even if your tooling appends one by default. And delivery
 is always a pull request — work on a branch, open a PR, and never merge your
 own work, in this repo or in the submodule, however mechanical the change.
-
-**Open questions have moved.** Q1 is settled: the project is **Datum**, and
-the rename is complete across both repositories. Q4 turns out to be larger
-than a venue preference — see §2.
 
 ---
 
@@ -134,20 +130,18 @@ bite you first:
 - Decision records are numberless drafts (`ADR-XXXX`) until a human ratifies
   them. **You draft; humans ratify.** Never assign a number.
 - Drafts have no memory. If a decision changes while drafting, rewrite the
-  draft as though the final position were held from the start. The CI lint bans
-  a specific vocabulary. Quoted here so you know what to avoid: `previously`,
-  `originally`, `earlier draft`, `supersedes the … stance`, `re-review`,
-  `renumber`, `retroactive`, `corrected`. Check
-  `governance/qm/project-seed/ci/adr-lint.yml` for the authoritative list.
-  **Amended:** no path exclusion is needed for this file. The seed lint globs
-  `governance/qm/adr/DRAFT-*.md` only, so it never reaches `HANDOFF.md`, and
-  the workflow is copied verbatim with no edit. If anyone ever broadens that
-  glob, this file needs excluding — the list above is why.
+  draft as though the final position were held from the start, rather than
+  annotating what it used to say. `governance/qm/project-seed/ci/adr_lint.py`
+  holds the authoritative banned vocabulary and enforces it over prose only, so
+  quoting the list inside a code span is fine. The lint globs
+  `governance/qm/adr/DRAFT-*.md`, so it does not reach this file; the rule
+  still applies here, and this packet is written to it.
 - One decision per record. If Consequences starts describing a second
   decision, split it.
-- House stack is Python: FastAPI, SQLModel/Pydantic, Click, Jinja2, httpx,
-  pytest, uv. A dependency outside that set needs a record before it appears in
-  review.
+- House stack is Python: Pydantic, Click, pytest, uv. A dependency outside that
+  set needs a record before it appears in review. Two exist — `jsonschema` and
+  `paho-mqtt` — each with a record, and both are development dependencies
+  imported lazily inside functions so the runtime package loads without either.
 
 ---
 
@@ -181,40 +175,44 @@ These are settled. Do not re-open them, and do not work around them.
 If your work reaches one of these, stop and ask. Deciding one by stealth is a
 governance violation, not a shortcut.
 
+Numbering matches `PLAN.md` §9.
+
 | # | Question | Blocks |
 |---|---|---|
-| Q1 | ~~**Project name.**~~ **Settled: Datum.** A datum is the fixed reference a machinist or surveyor measures everything else from, and the singular of *data*. Both senses are true of a module whose deliverable is one unit of data from a stable point. | Nothing — the rename is done |
-| Q2 | T4 untethered tier: nRF52840 with a BTHome broadcaster, or ESP32-C6 with deep sleep | Nothing in M1 |
-| Q3 | Zigbee end-device firmware: wait for ESPHome's in-flight support, or ship against esp-zigbee and carry a patch | Nothing in M1 |
-| Q4 | Hardware licensing: **the org corpus has no mechanism that can see a schematic**, so this is not only a venue question — see below | WP-6 can proceed either way; the record's Status cannot be settled |
-| Q5 | Anything requiring USB-C power delivery negotiation | Nothing yet; if you find a reason, that is a finding worth reporting |
+| Q1 | T4 untethered tier: nRF52840 with a BTHome broadcaster, or ESP32-C6 with deep sleep | Nothing in M1 |
+| Q2 | Zigbee end-device firmware: wait for ESPHome's in-flight support, or ship against esp-zigbee and carry a patch | Nothing in M1 |
+| Q3 | Hardware licensing: **the org corpus has no mechanism that can see a schematic** — see below | WP-6 can proceed either way; the record's Status cannot be settled |
+| Q4 | Anything requiring USB-C power delivery negotiation | Nothing yet; if you find a reason, that is a finding worth reporting |
+| Q5 | Remote detention: whether a controller may set a module's detent from off-device | Nothing in M1; it would add the first inbound path to the contract |
 
-**Q1 is closed.** `datum` is the settled name and is free to appear anywhere:
-the package, the MQTT topic root, part directory names, prose, the governance
-branch (`project/datum`) and the repository. The one thing still carrying the
-old placeholder is this working directory's own name, which is cosmetic and
-resolves when the repository is cloned from its published home.
+The project's name is **Datum**, and it is free to appear anywhere: the
+package, the MQTT topic root, part directory names, prose, the governance
+branch (`project/datum`) and the repository.
 
-**On Q4, amended.** The packet frames this as choosing a venue. The venue is
-the smaller half. The org open-license record fixes its criterion as
-OSI-approved or FSF-free and its enforcement as a generated dependency-license
-report along one of two paths, and both paths enumerate software dependencies.
-A schematic, a layout, a footprint library and a BOM are copyrightable works
-that OSI does not review and no dependency report can reach. This project can
-therefore run every gate the org mandates, report zero violations, and publish
-its principal deliverable with no grant on it at all — which under P1 means a
-recipient holding the design cannot modify or redistribute it.
+**On Q3.** The org open-license record fixes its criterion as OSI-approved or
+FSF-free and its enforcement as a generated dependency-license report along one
+of two paths, and both paths enumerate software dependencies. A schematic, a
+layout, a footprint library and a BOM are copyrightable works that OSI does not
+review and no dependency report can reach. This project can therefore run every
+gate the org mandates, report zero violations, and publish its principal
+deliverable with no grant on it at all — which under P1 means a recipient
+holding the design cannot modify or redistribute it.
 
 Precedence lets a project *add* constraints to an org record. What is missing
-here is not a constraint but an enforcement mechanism, and a project cannot
-add one to an org record. That is why Q4 does not resolve by picking a venue.
-REUSE plus SPDX headers is the candidate — it is generated rather than
-hand-compiled as the record's clause 4 requires, and it is the only mechanism
-of the three that sees a `.kicad_sch`. The argument is written up in
+here is not a constraint but an enforcement mechanism, and a project cannot add
+one to an org record, so this does not resolve by picking a venue. REUSE plus
+SPDX headers is the candidate — it is generated rather than hand-compiled as
+the record's clause 4 requires, and it is the only mechanism of the three that
+sees a `.kicad_sch`. The argument is written up in
 `governance/qm/perspectives/2026-08-08-hardware-onramp-invisible-artifacts.md`
-with a proposed org amendment. Do not act on it: a perspective never
-graduates on its own, and this remains a human decision. **Escalate when WP-6
-reaches it; do not settle the record's Status yourself.**
+with a proposed org amendment. Do not act on it: a perspective never graduates
+on its own, and this remains a human decision. **Escalate when WP-6 reaches it;
+do not settle the record's Status yourself.**
+
+**On Q5.** Detention is local: a module is armed or detained, and the state
+sits on a retained topic. A controller setting that state remotely means every
+consumer becomes a potential publisher, which is a bigger change than the
+feature looks. Nothing in M1 needs it.
 
 ---
 
@@ -237,35 +235,33 @@ Follow `governance/qm/README.md` § "Forking a new project" verbatim. In short:
    verbatim). Push.
 3. Point the submodule at that branch tip; add `branch = project/datum` to
    `.gitmodules`.
-4. Copy `project-seed/ci/adr-lint.yml` into `.github/workflows/`, unmodified.
+4. Copy the seed's `adr-lint.yml`, `reuse-lint.yml` and `submodule-check.yml`
+   into `.github/workflows/`, unmodified.
 
-   **Amended — an open conflict, not a settled instruction.** The fork
-   procedure's step 4 requires the ADR lint *and* a license gate at
+   **The dependency-manifest licence gate is a carried gap.** The fork
+   procedure's step 4 requires the ADR lint *and* a licence gate at
    instantiation: "a project without both is not instantiated, it is
-   improvised." This packet routes the license gate to WP-6, several work
-   packages later. Both positions are defensible; together they open an
-   interval in which this repository is improvised by the org's own standard,
-   and nothing detects it, because an unwired gate is indistinguishable from a
-   passing one. The interval is currently open. Closing it early costs about
-   forty lines — apothecary's `license-check.yml` is the dependency-manifest
-   precedent and needs only a package to point at, which arrives with WP-1.
-   Whoever picks up WP-1 should either wire it then or say plainly that the
-   gap is being carried.
+   improvised." The REUSE half is wired; the dependency-manifest half is not,
+   and until it is, this repository is improvised by the org's own standard
+   with nothing detecting it — an unwired gate is indistinguishable from a
+   passing one. Closing it costs about forty lines: apothecary's
+   `license-check.yml` is the precedent, and it needs only a package to point
+   at, which `schema/` already provides.
 5. Copy `project-seed/ide/` recursively onto the repository root **with
    symlinks preserved**. `CLAUDE.md` and `.github/copilot-instructions.md` are
    real symlinks to `AGENTS.md`, not copies. Fill in setup and test commands
    below `AGENTS.md`'s marked line; the governance section above it stays
-   verbatim.
+   verbatim apart from replacing `<name>`.
 
-   **Amended, and this one costs a day if you trust the original wording.** The
-   fork procedure lists `cp -a`, `rsync -a` and `git checkout` as
-   interchangeable. On Windows they are not. `cp -a` under MSYS produced a
-   *regular file* for `CLAUDE.md` holding `AGENTS.md`'s content, and failed
-   outright on `.github/copilot-instructions.md`. The regular-file result is
-   the dangerous one: it passes any check shaped like "does `CLAUDE.md` contain
-   the governance text" while breaking the one invariant the symlink exists for
-   — that editing `AGENTS.md` keeps all three current. Write the entries into
-   the index and materialize them, and assert the **mode**, not the content:
+   **On Windows, `cp -a`, `rsync -a` and `git checkout` are not
+   interchangeable, and the fork procedure lists them as if they were.** Under
+   MSYS, `cp -a` produced a *regular file* for `CLAUDE.md` holding `AGENTS.md`'s
+   content, and failed outright on `.github/copilot-instructions.md`. The
+   regular-file result is the dangerous one: it passes any check shaped like
+   "does `CLAUDE.md` contain the governance text" while breaking the invariant
+   the symlink exists for — that editing `AGENTS.md` keeps all three current.
+   Write the entries into the index and materialize them, and assert the
+   **mode**, not the content:
 
    ```bash
    git update-index --add --cacheinfo 120000,$(printf '%s' 'AGENTS.md'    | git hash-object -w --stdin),CLAUDE.md
@@ -281,20 +277,19 @@ Follow `governance/qm/README.md` § "Forking a new project" verbatim. In short:
    `.vscode/*` plus `!.vscode/settings.json` and `!.vscode/extensions.json`.
    A blanket rule silently prevents the checked-in workspace config from ever
    being committed.
-7. Move the five drafts in this packet's `adr/` onto the project branch as
-   numberless drafts. Leave Status as-is.
+7. Move this project's drafts onto the project branch as numberless drafts.
+   Leave Status as-is.
 
-**Acceptance:** a fresh clone resolves `CLAUDE.md` to `AGENTS.md` content;
-`adr-lint` passes on all five drafts; `git submodule update --remote` tracks
-`project/datum`.
+**Acceptance:** `git ls-files -s` reports mode `120000` for `CLAUDE.md` and
+`.github/copilot-instructions.md`; `adr-lint` passes over every draft;
+`git submodule update --remote` tracks `project/datum`.
 
-**Amended — the first criterion is conditional on Windows.** `core.symlinks`
-is not set globally on the build machine, so a fresh clone materializes both
-symlinks as one-line pointers until the one-time step in `AGENTS.md` runs
-(`git config core.symlinks true` then `git checkout -- .`). That is the
-documented, expected degradation, not a defect: the committed tree is correct
-either way, which is why the mode check above is the criterion that actually
-holds. Verified in both states.
+The mode check is the criterion rather than the file contents, because
+`core.symlinks` is off by default on Windows: a fresh clone there materializes
+both pointers as one-line text files holding the target path until the one-time
+step in `AGENTS.md` runs (`git config core.symlinks true`, then
+`git checkout -- .`). That degradation is documented and expected — the
+committed tree is correct either way. Verified in both states.
 
 ---
 
@@ -544,24 +539,22 @@ When M1 lands, or when you stop:
 - Any place where this packet and the ADRs disagree. The ADRs win; the packet
   gets fixed.
 
-### Reported so far — WP-0
+### Upstream gaps already reported
 
-Recorded here so the next session does not re-report it as new.
+Named here so they are not re-reported as new, and so the next session knows
+where each one is being carried.
 
-- **Assertions green:** none. All six require a payload; WP-0 builds none.
-  WP-0's own three acceptance criteria are green and were checked against a
-  real fresh clone rather than asserted.
-- **Open questions reached:** Q1 and Q4. Q1 was escalated before any
-  outward-facing action; the placeholder is in force and nothing is published
-  under it. Q4 was escalated and found to be larger than the packet framed it
-  — see §2.
-- **Upstream gaps found:** none in ESPHome, apothecary or KiCad, none of which
-  WP-0 touches. Three were found in the QM corpus itself, which is the closest
-  layer of the stack for governance and therefore where they were reported:
-  the fork procedure's symlink-copy guidance is wrong on Windows; the
-  open-license record's enforcement cannot see hardware artifacts; and gate
-  *absence* is undetectable, which the corpus demonstrates on itself by
-  running no CI over its own records. All three are written up as an org-level
-  perspective with proposals, on the branch named in §2. Per the org record,
-  a capability gap closes upstream — that is what the perspective is.
-- **Packet corrections applied:** the four marked **Amended** blocks above.
+None in ESPHome, apothecary or KiCad, none of which the completed work touches.
+Four are in the QM corpus itself, which is the closest layer of the stack for
+governance and therefore where they belong:
+
+| Gap | Where it is carried |
+|---|---|
+| The fork procedure's symlink-copy guidance is wrong on Windows | `perspectives/2026-08-08-hardware-onramp-invisible-artifacts.md` |
+| The open-license record's enforcement cannot see hardware artifacts | Same perspective, with a proposed org amendment. Q3 above |
+| Gate *absence* is undetectable, and the corpus demonstrates it on itself | Same perspective |
+| The topic contract's retention terms have no record | Named in `docs/topic-contract.md`; drafting one is open work |
+
+Per the org record a capability gap closes upstream, which is what those
+perspectives are. A private workaround would be a debt against the commons this
+project stands on.

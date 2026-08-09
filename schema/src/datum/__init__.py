@@ -1,7 +1,12 @@
-"""The event envelope, and the smallest system that proves it is worth having.
+"""The event envelope, and the pieces that exercise it.
 
-The schema is the durable artifact. Firmware, boards and enclosures are
-replaceable around it; a consumer written against this envelope is not.
+Exports the envelope models (``Event``, ``Announce``, ``Action``, ``Color``),
+the topic helpers, the conformance vector loaders, and the two stand-ins the
+cookbook drives — ``Bus`` for the broker and ``Lamp`` for a subscribing
+consumer.
+
+``docs/cookbook.md`` is the worked example; ``docs/envelope.md`` documents the
+payload.
 """
 
 from .bus import Bus

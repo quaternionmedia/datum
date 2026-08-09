@@ -144,11 +144,12 @@ carries the full list with reasons; the ones that bite first:
 `HANDOFF.md` §2 holds the table. Reaching one of these means stopping and
 asking; deciding one by stealth is a governance violation, not a shortcut.
 
-The naming question that used to head this list is settled: the project is
-**Datum**, and the name is free to appear anywhere. What remains open is Q4
-(hardware licensing, which is a missing org mechanism rather than a venue
-choice) and whether a controller may set a module's detent remotely, which
-would add the first inbound path to an otherwise outbound contract.
+Five are open. The two that touch M1's edges: **Q3**, hardware licensing, which
+is a missing org mechanism rather than a choice of venue — no dependency report
+can see a `.kicad_sch`, so this project can pass every gate and still publish
+its principal deliverable with no grant on it. And **Q5**, whether a controller
+may set a module's detent remotely, which would add the first inbound path to
+an otherwise outbound contract.
 
 ## Definition of done for Milestone 1
 

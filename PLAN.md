@@ -144,7 +144,7 @@ bench, rack and instrument-stand placements natural and the mid-wall placement
 awkward — a wall installation needs an in-box receptacle or a Class 2 supply
 run to it, and neither is a printed part. It also means the untethered tier is
 a genuinely different board, not a stuff option, and its firmware story is
-different too (see §9.2). The plan does not pretend otherwise: T4 is deferred
+different too (see §9.1). The plan does not pretend otherwise: T4 is deferred
 with its reasons named, rather than half-supported.
 
 ### 3.4 The retrofit path, which is the actual pitch
@@ -248,13 +248,20 @@ Parts land upstream in `quaternionmedia/apothecary`, in its existing
 `parts/<name>/` plus wrapper idiom:
 
 ```
-parts/datum-core/datum-core.scad         # PCB carrier, light pipe, cap seat
-parts/datum-cap/datum-cap.scad           # the pressed surface
-parts/datum-mount-desk/…                   # weighted desk puck (M1 mount)
-parts/datum-mount-plate/…                  # 1-gang plate carrier
-parts/datum-mount-din/…                    # DIN clip
-apothecary/projects/parts/datum_core.py    # BasePart wrapper + Params
+parts/datum/datum.scad                     # the core body: PCB tray, USB opening,
+                                           #   antenna thinning, light pipe, cap seat
+apothecary/projects/parts/datum.py         # BasePart wrapper + Params
 ```
+
+`parts/datum/` exists and is parametric in the board it carries: its dimensions
+come from a `BlackBoxProvider`, so the same part serves a hand-entered stub
+today and a real KiCad outline later with no change to the part. That is what
+lets the defaults render a coherent object knowing nothing about this PCB,
+which is apothecary's own requirement.
+
+Mounts are separate parts as they arrive — a weighted desk puck for M1, then a
+1-gang plate carrier and a DIN clip. Whether the pressed cap is a second part
+or a parameter of the core is open until the first one is printed.
 
 The modularity claim has to hold physically as well as in the schema: **one
 core body, many mount adapters.** The mount is what changes between a wall, a
@@ -310,6 +317,8 @@ datum/
 ├── .vscode/{settings,extensions}.json
 ├── .github/workflows/
 │     adr-lint.yml              # verbatim from the seed
+│     reuse-lint.yml            # verbatim from the seed
+│     submodule-check.yml       # verbatim from the seed
 │     license-gate.yml          # dependency-manifest path (non-container shape)
 │     schema.yml                # conformance vectors, JSON Schema emit
 │     hardware.yml              # KiBot: ERC, DRC, fab artifacts on tag
@@ -317,8 +326,15 @@ datum/
 ├── schema/                     # the seam
 ├── firmware/                   # ESPHome packages + external components
 ├── hardware/t1-core/           # KiCad 9
-└── docs/
+├── docs/                       # the executable reference; README.md is an onramp
+└── README.md, AGENTS.md, HANDOFF.md
 ```
+
+Three of the six workflows are wired: `adr-lint`, `reuse-lint` and
+`submodule-check`, all copied from the seed without edit, plus `schema.yml`
+which runs the documentation against a Mosquitto service container.
+`license-gate`, `hardware` and `firmware` arrive with the work packages that
+give them something to check.
 
 The license gate follows the **dependency-manifest-plus-allowlist** path, not
 the SBOM-per-image path, since the runtime shape is firmware and packages
@@ -337,8 +353,11 @@ in the path and no vendor account.
 
 **Machine-checked assertions:**
 
-1. The emitted JSON Schema validates six golden event vectors and rejects four
-   malformed ones.
+1. The emitted JSON Schema validates six golden event vectors and rejects three
+   malformed ones. The fourth malformed vector, non-monotonic `seq`, is refused
+   by a stateful check instead: monotonicity is a property of a sequence, and a
+   single-event schema cannot express a relationship between one payload and
+   the one before it. Two kinds of guarantee, two kinds of gate.
 2. A firmware-emitted event, captured in a host-side test, round-trips the
    documented topic contract and validates against that schema.
 3. A consumer pinned to the v1 schema parses a capability-extended event
@@ -359,28 +378,42 @@ fail on.
 
 ## 9. Open questions — named, not decided
 
-1. ~~**Name.**~~ **Settled: Datum.** The fixed reference a machinist or
-   surveyor measures from, and the singular of *data*. Both senses describe a
-   module whose deliverable is one unit of data from a stable, identified
-   point — and the smallest complete unit, which is the §1 test in a word.
-2. **T4 untethered tier.** Whether it is an nRF52840 with a Zephyr or NimBLE
+1. **T4 untethered tier.** Whether it is an nRF52840 with a Zephyr or NimBLE
    BTHome broadcaster, or an ESP32-C6 with deep sleep. Decided by a measured
    power budget, and not blocking anything in M1. The honest expectation is
    that it becomes a second board with a second firmware story rather than a
    variant of this one.
-3. **Zigbee timing.** Whether a Zigbee end-device build waits on ESPHome's
+2. **Zigbee timing.** Whether a Zigbee end-device build waits on ESPHome's
    in-flight Zigbee support landing, or ships against esp-zigbee directly and
    carries a patch. The latter creates a carried-patch register entry, which is
    an org-level commitment.
-4. **Hardware licensing venue.** Whether the CERN-OHL-S clause is a project
-   record or an amendment to the org open-license record. A project may add
-   constraints and may not waive them, so a project record is legal; the
-   argument for org level is that the next hardware project faces the identical
-   question.
-5. **USB-C source expectations.** Whether the board declares anything beyond
+3. **Hardware licensing has no org mechanism.** The open-license record fixes
+   its criterion as OSI-approved or FSF-free and its enforcement as a generated
+   dependency-licence report along one of two paths, and both paths enumerate
+   *software* dependencies. A schematic, a layout, a footprint library and a
+   BOM are copyrightable works that OSI does not review and no dependency
+   report can reach. This project can therefore run every gate the org mandates,
+   report zero violations, and publish its principal deliverable with no grant
+   on it at all — which under P1 means a recipient holding the design cannot
+   modify or redistribute it.
+
+   Precedence lets a project *add* constraints to an org record. What is
+   missing here is not a constraint but an enforcement mechanism, and a project
+   cannot add one to an org record, so this does not resolve by choosing a
+   venue. REUSE plus SPDX headers is the candidate: it is generated rather than
+   hand-compiled as the record's clause 4 requires, and it is the only one of
+   the three mechanisms that can see a `.kicad_sch`. The argument is written up
+   in `governance/qm/perspectives/2026-08-08-hardware-onramp-invisible-artifacts.md`
+   with a proposed org amendment, which a human decides.
+4. **USB-C source expectations.** Whether the board declares anything beyond
    default 5 V sink behaviour. A 5.1 kΩ CC termination gets 5 V at whatever the
    source advertises, which is sufficient. Any PD negotiation would add a
    controller and a reason to justify it, and no such reason exists yet.
+5. **Remote detention.** Whether a controller may set a module's detent from
+   off-device. Detention is local today. Anything remote adds the first inbound
+   path to a contract that is otherwise outbound-only, which is a larger change
+   than the feature looks — every consumer becomes a potential publisher, and
+   the topic contract grows a direction it does not currently have.
 
 ---
 
@@ -415,11 +448,18 @@ fail on.
 
 ## 11. Immediate next actions
 
-1. Settle the name (§9.1) — everything else is blocked on a repository path.
-2. Ratify or return the five accompanying drafts.
-3. Hand `HANDOFF.md` to a coding agent. Work package order is fixed there and
-   starts with the schema, because it is the artifact everything else conforms
-   to and the cheapest thing to get wrong early.
-4. Breadboard a C6 devkit with four contacts and one LED, running stock
+1. Breadboard a C6 devkit with four contacts and one LED, running stock
    ESPHome, publishing envelope JSON over MQTT. That validates the whole seam
-   before a single pad is placed.
+   before a single pad is placed, and it is what turns assertion 2 from a
+   stand-in capture into a real one.
+2. Wire the dependency-manifest licence gate. It needs only a package to point
+   at, which the schema already provides, and until it exists this repository
+   is improvised by the fork procedure's own standard — an unwired gate is
+   indistinguishable from a passing one.
+3. Populate the non-MQTT rows of `schema/projections/README.md`: which axes
+   each transport carries, and which it drops.
+
+The nine drafts on `project/datum` are ratified by a human, not by this
+project. Ratification waits on a second active code owner at org level, so the
+drafts stay unratified and the work below them proceeds regardless — the
+discipline is enforced by CI today, and a Status field is what is pending.

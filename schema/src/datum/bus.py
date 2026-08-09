@@ -1,15 +1,13 @@
 """An in-process stand-in for the broker, implementing the topic contract.
 
-This is **not** an MQTT implementation and must never become one. The broker is
-an engine and gets selected, not written. What this class exists for is to make
-the contract's retention semantics executable in the cookbook without a running
-broker, so the demo is a test rather than a screenshot.
+Makes the contract's retention semantics executable in ``docs/cookbook.md``
+with no broker running. It is **not** an MQTT implementation and must never
+become one: the broker is an engine this project selects rather than writes.
 
-The over-the-wire proof against a real broker is WP-2, and it needs an MQTT
-client library — a dependency outside the blessed house-stack set, so it needs
-a record before it appears in review. Until then the seam is exercised here and
-the wire is not, and the cookbook says so rather than implying coverage it does
-not have.
+It models delivery and retention only. A real broker also clears the retain
+flag when delivering to an already-established subscription, which this does
+not reproduce — ``datum.harness`` and ``docs/wire.md`` cover that against a
+live Mosquitto.
 """
 
 from __future__ import annotations
