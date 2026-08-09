@@ -35,3 +35,8 @@ fp-info-cache
 
 # ESPHome build tree
 firmware/.esphome/
+
+# Scratch clones for cross-repository work — apothecary parts are developed
+# against this project's board dimensions and land upstream as pull requests,
+# never here. Nothing under sandbox/ is part of this repository.
+sandbox/
