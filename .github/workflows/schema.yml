@@ -1,6 +1,6 @@
 name: Schema
 
-# Runs the documentation. README.md, WIRE.md and the module docstrings are the
+# Runs the documentation. README.md, docs/ and the module docstrings are the
 # whole test suite -- there is no tests/ directory by design, so this job is
 # what stands between a claim in the docs and it quietly becoming false.
 #
