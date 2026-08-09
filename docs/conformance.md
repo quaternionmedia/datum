@@ -47,6 +47,3 @@ The invariant is real, and takes a stateful check:
 
 Two kinds of guarantee, two kinds of gate. `datum validate` applies the second
 when given an array — see `docs/cli.md`.
-
-`HANDOFF.md`'s "Correction to WP-1's acceptance" records why the packet asked
-for four schema-rejected vectors and gets three.

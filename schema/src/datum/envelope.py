@@ -1,14 +1,14 @@
 """The event envelope — the project's interface.
 
-Every transport carries this or a documented projection of it. The
-compatibility guarantee lives here and nowhere else: fields are added, never
-removed and never repurposed, and unknown fields are ignored rather than
-rejected.
+Every transport carries this or a documented projection of it. Fields are
+added, never removed and never repurposed, and unknown fields are ignored
+rather than rejected.
 
-That last rule is one line of model config (``extra="ignore"``) and it is the
-entire forward-compatibility mechanism. It is stated explicitly rather than
-inherited from a default, because a default can be changed by an upgrade
-without anyone deciding to change it.
+``extra="ignore"`` is set explicitly on the model config rather than left to a
+default. Changing it closes the envelope and breaks every consumer already
+written; ``closed_objects()`` in ``datum.conformance`` checks the emitted
+schemas for the same property. The decision is
+``governance/qm/adr/DRAFT-event-envelope-is-the-seam.md``.
 """
 
 from __future__ import annotations
