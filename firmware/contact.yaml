@@ -28,7 +28,10 @@ binary_sensor:
           - ON for at most ${gap}
           - OFF for at least ${gap}
         then:
-          - script.execute: { id: emit, ch: ${ch}, action: triple }
+          - script.execute:
+              id: emit
+              ch: ${ch}
+              action: triple
 
       - timing:
           - ON for at most ${gap}
@@ -36,13 +39,19 @@ binary_sensor:
           - ON for at most ${gap}
           - OFF for at least ${gap}
         then:
-          - script.execute: { id: emit, ch: ${ch}, action: double }
+          - script.execute:
+              id: emit
+              ch: ${ch}
+              action: double
 
       - timing:
           - ON for at most ${gap}
           - OFF for at least ${gap}
         then:
-          - script.execute: { id: emit, ch: ${ch}, action: single }
+          - script.execute:
+              id: emit
+              ch: ${ch}
+              action: single
 
       # Fires while the contact is still closed, which is what makes the
       # release below the second half of a pair rather than a duplicate.
@@ -50,7 +59,10 @@ binary_sensor:
           - ON for at least ${hold}
         then:
           - lambda: 'id(held)[${ch}] = true;'
-          - script.execute: { id: emit, ch: ${ch}, action: hold }
+          - script.execute:
+              id: emit
+              ch: ${ch}
+              action: hold
 
     # Only after a hold. Every gesture ends in a release, and emitting one
     # each time would double the event count for a single press.
@@ -60,4 +72,7 @@ binary_sensor:
             lambda: 'return id(held)[${ch}];'
           then:
             - lambda: 'id(held)[${ch}] = false;'
-            - script.execute: { id: emit, ch: ${ch}, action: release }
+            - script.execute:
+                id: emit
+                ch: ${ch}
+                action: release

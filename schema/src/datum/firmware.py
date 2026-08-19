@@ -128,7 +128,7 @@ def emitted_actions() -> set[str]:
     """
     text = (firmware_dir() / PACKAGE).read_text(encoding="utf-8")
     return {
-        line.rsplit("action:", 1)[1].strip(" }")
+        line.split("action:", 1)[1].strip()
         for line in text.splitlines()
-        if "script.execute:" in line and "action:" in line
+        if line.strip().startswith("action:")
     }

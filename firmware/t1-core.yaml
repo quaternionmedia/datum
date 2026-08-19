@@ -23,7 +23,7 @@ substitutions:
   # raw string literal, so the quotes survive substitution unescaped. Field
   # order matches the Pydantic models: a consumer diffing bytes sees no
   # difference between an event from here and one from `Event.wire_json()`.
-  event_format: '{"src":"%s","seq":%u,"caps":["press"],"action":"%s","ch":%u}'
+  event_format: '{"src":"%s","seq":%u,"caps":["press"],"action":"%s","ch":%d}'
   announce_format: '{"schema_version":"%s","src":"%s","caps":["press"],"hw":"%s","fw":"%s"}'
 
   # GPIO map. None of these is a strapping pin (4, 5, 8, 9, 15), a USB pin
@@ -143,7 +143,26 @@ light:
     default_transition_length: 0s
 
 packages:
-  contact_0: !include { file: contact.yaml, vars: { ch: '0', pin: ${contact_0_pin} } }
-  contact_1: !include { file: contact.yaml, vars: { ch: '1', pin: ${contact_1_pin} } }
-  contact_2: !include { file: contact.yaml, vars: { ch: '2', pin: ${contact_2_pin} } }
-  contact_3: !include { file: contact.yaml, vars: { ch: '3', pin: ${contact_3_pin} } }
+  contact_0: !include
+    file: contact.yaml
+    vars:
+      ch: '0'
+      pin: ${contact_0_pin}
+
+  contact_1: !include
+    file: contact.yaml
+    vars:
+      ch: '1'
+      pin: ${contact_1_pin}
+
+  contact_2: !include
+    file: contact.yaml
+    vars:
+      ch: '2'
+      pin: ${contact_2_pin}
+
+  contact_3: !include
+    file: contact.yaml
+    vars:
+      ch: '3'
+      pin: ${contact_3_pin}
