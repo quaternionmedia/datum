@@ -20,17 +20,23 @@ clause 2).
 
 ## State on arrival
 
-**WP-0, WP-1 and WP-2 are complete. WP-3 (firmware) is next.** `main` is
-pushed and is the published state; work reaches it as pull requests.
+**WP-0, WP-1 and WP-2 are complete. WP-3 is under way and is not done.**
+`main` is pushed and is the published state; work reaches it as pull requests.
+
+WP-3's configuration exists, CI compiles it, and `docs/firmware.md` checks its
+topics and payloads against the constants. **Nothing has been flashed.** WP-3
+closes when a real device produces a real capture, and until it does, assertion
+2 stays qualified exactly as it was — see below. Do not read a green firmware
+build as a working button.
 
 What exists:
 
 | | |
 |---|---|
-| Project repository | `main`. Governance wiring, the schema package, the retrofit demo, and the wire harness. No firmware, no hardware, no geometry. |
+| Project repository | `main`. Governance wiring, the schema package, the retrofit demo, the wire harness, and the ESPHome configuration at `firmware/`. No hardware, no geometry. |
 | `governance/qm` submodule | Pinned to `project/datum`. |
 | Decision records | Nine, numberless, at `governance/qm/adr/`. None is an adoption record. |
-| CI | `adr-lint.yml`, `reuse-lint.yml` and `submodule-check.yml` (seed, verbatim), plus `schema.yml`, which runs the documentation against a Mosquitto service container. |
+| CI | `adr-lint.yml`, `reuse-lint.yml` and `submodule-check.yml` (seed, verbatim), plus `schema.yml`, which runs the documentation against a Mosquitto service container, and `firmware.yml`, which validates and compiles the ESPHome configuration in a matrix. |
 | Licensing | `LICENSE`, `LICENSES/` and `REUSE.toml` are in place and `reuse lint` is clean. **The dependency-manifest licence gate WP-6 owes is still unwired** — the REUSE gate is one of the two the org record asks for, not both. |
 
 **Assertions green: 1, 2 and 3 of six.**
@@ -42,7 +48,10 @@ What exists:
    real broker and validates. Qualified: the captured event is a stand-in
    written against the contract until WP-3 produces a real capture. Everything
    else in that path — topic, encoding, retention, schema validation — runs
-   against Mosquitto over a socket.
+   against Mosquitto over a socket. `docs/firmware.md` narrows what the
+   stand-in is standing in for: the bytes the firmware would send are checked
+   against the bytes the stand-in carries, so the remaining gap is the device
+   and the contact, not the payload.
 3. A v1-pinned consumer parses a capability-extended event and yields an
    identical `action`. This is the one that matters, and it is demonstrated
    inside the demo rather than off in a test file.

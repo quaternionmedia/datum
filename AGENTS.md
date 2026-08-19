@@ -114,7 +114,7 @@ from scratch again.
 | WP-0 | Repository bootstrap | this file, `governance/` | done |
 | WP-1 | The event envelope | `schema/`, `docs/` | done |
 | WP-2 | Topic contract and MQTT harness | `schema/topics.py`, `schema/harness.py`, `docs/wire.md` | done |
-| WP-3 | Firmware, stock ESPHome on ESP32-C6 | `firmware/` | next |
+| WP-3 | Firmware, stock ESPHome on ESP32-C6 | `firmware/` | in progress, nothing flashed |
 | WP-4 | Hardware, T1-Core, KiCad 9 | `hardware/t1-core/` | |
 | WP-5 | Enclosure | **`quaternionmedia/apothecary`**, not here | |
 | WP-6 | License and REUSE gates | `.github/workflows/` | |

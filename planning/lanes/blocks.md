@@ -6,6 +6,12 @@ Use this file for blockers that can prevent HIL completion or release readiness.
 
 - [ ] Q3 hardware licensing path still needs human governance resolution before release-signoff.
 - [ ] BOM not yet acquired; hardware validation steps are staged but not executable.
+      Scope correction: this blocks WP-4, not WP-3. WP-3 needs one ESP32-C6
+      devkit, which is not a BOM item.
+- [ ] No ESP32-C6-DevKitC-1 on hand. This is the only thing between the
+      firmware configuration and closing milestone assertion 2.
+- [ ] Firmware compile is unverified locally; ESPHome is not installed and the
+      CI job has not yet run on a pull request.
 
 ## Risk template
 
@@ -17,6 +23,15 @@ Use this file for blockers that can prevent HIL completion or release readiness.
 - Target date:
 
 ## Risk log
+
+- Risk: a green firmware CI build is mistaken for a working button
+- Trigger: WP-3 looks complete in the tree while nothing has been flashed
+- Impact: assertion 2 reported green when it is still riding a stand-in vector
+- Owner: planning loop
+- Next action: HANDOFF.md State on arrival says so in bold; keep it there until
+  a real capture replaces schema/vectors/captured/t1-core-single-press.json
+- Target date: when a devkit is available
+
 
 - Risk: IRL validation scope creep
 - Trigger: Matrix exists but may expand without a minimum pass set guard
