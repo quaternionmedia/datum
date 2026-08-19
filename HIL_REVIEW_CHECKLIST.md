@@ -1,80 +1,113 @@
-# HIL review checklist for Datum
+# HIL review checklist
 
-## Status
+What is proven, what is proven only on paper, and what needs a board on a
+bench. The split matters: this project has been careful about not reporting a
+skipped assertion as a pass, and this file follows the same rule.
 
-This checklist tracks work that is ready to continue locally versus work that should be reviewed in a hardware-in-the-loop (HIL) pass once the BOM is available.
+## Run this first
 
-## Locally completed
+```bash
+uv run python demo/hil.py
+```
 
-- [x] Repo baseline confirmed with the project’s actual test suite
-- [x] Local verification command: `uv run pytest`
-- [x] Result: 11 passed, 1 skipped
+One command, no servers, nothing left running. It proves everything provable
+without hardware and prints the remaining IRL cases. See
+[`demo/README.md`](demo/README.md).
+
+## Proven, locally and repeatably
+
+- [x] `uv run pytest` — 20 collected, 19 passed, 1 skipped
+- [x] The skip is `docs/wire.md`, which needs a broker and says so
+- [x] Ten checked-in vectors: six accepted, four rejected, each leaving a report
+- [x] A v1-pinned consumer parses a capability-extended event and yields an
+      identical `action` — milestone assertion 3, the one that matters
+- [x] `esphome config firmware/t1-core.yaml` reports the configuration valid
+      on ESPHome 2026.7.4
+- [x] The firmware seam holds: topics and payload templates read back out of
+      the YAML match the Python constants byte for byte
+- [x] `apothecary parts verify datum-core` — declared bounds match geometry
+- [x] `reuse lint` clean
 - [x] Governance brief reviewed: `AGENTS.md`, `HANDOFF.md`, `PLAN.md`
-- [x] Project constraints and non-negotiables reviewed against the existing design brief
 
-## Ready for HIL review after BOM acquisition
+## Proven only on paper
 
-### BOM and parts review
+Written down, internally consistent, and never executed against the thing it
+describes.
 
-- [ ] Confirm BOM matches T1 Core architecture and USB-C bus-power assumption
-- [ ] Verify that every BOM line has two independent sources or documented alternate footprint
-- [ ] Check availability, lead time, and footprint compatibility for all parts
-- [ ] Flag any single-source or high-risk parts before schematic signoff
-- [ ] Confirm C6 module and USB connector choice match the intended radio and power plan
+- [ ] **The firmware has never been compiled.** `esphome compile` reaches
+      codegen and fails installing the ESP-IDF framework on Windows, before the
+      compiler runs. `.github/workflows/firmware.yml` on Linux is the only
+      thing that can settle it, and it has not run because nothing is pushed.
+- [ ] **The enclosure has never been fitted to anything.** Every dimension in
+      `datum-core` is an assumption; no schematic exists to check it against.
+- [ ] **No BOM.** Every hardware line below is staged, not executable.
 
-### Governance and compliance gate
-
-- [ ] Review Q3 hardware licensing issue with human approver before release or public sharing
-- [ ] Confirm REUSE compliance remains intact for hardware artifacts
-- [ ] Confirm dependency-manifest license gate is tracked or added before final release
-- [ ] Keep all code and hardware work on a branch and under PR flow per `AGENTS.md`
-- [ ] Ensure no design decisions are made by stealth around open questions in `HANDOFF.md`
-
-### Schematic and board validation
-
-- [ ] Create KiCad project under `hardware/<board>/`
-- [ ] Validate USB-C sink wiring, CC resistors, and D+/D- routing
-- [ ] Validate 3.3 V regulator sizing and decoupling against C6 load assumptions
-- [ ] Validate contact-input RC network and ESD strategy
-- [ ] Validate indicator LED net and power routing
-- [ ] Run ERC and DRC checks
-- [ ] Review the BOM against the netlist and footprint mapping
+## Needs a board on a bench
 
 ### Firmware bring-up
 
-- [ ] Implement or configure ESPHome path for T1 Core
-- [ ] Confirm contact input handling, debounce, and event generation
-- [ ] Confirm MQTT topic emission and retained-message behavior against the documented contract
-- [ ] Validate event serialization against the schema plus the compatibility rules
-- [ ] Capture a real firmware event and compare it to the contract
+- [x] ESPHome configuration written for T1-Core and validated
+- [ ] Flash an ESP32-C6-DevKitC-1 and confirm it boots
+- [ ] IRL-001 — single press emits one event, `action=single`
+- [ ] IRL-002 — hold then release emits two events, in that order
+- [ ] IRL-003 — ordered multi-press keeps `seq` monotonic across a run
+- [ ] IRL-004 — `seq` survives a reconnect without going backwards
+- [ ] IRL-005 — announce retained, reaches a late subscriber
+- [ ] IRL-006 — availability retained, last-will fires on an ungraceful drop
+- [ ] IRL-007 — an event is **not** retained; a late subscriber sees nothing
+- [ ] Replace `schema/vectors/captured/t1-core-single-press.json` with a real
+      capture. That one file is all that qualifies milestone assertion 2
+- [ ] Confirm no contact sits on a strapping pin in practice, not just on paper
+
+Stimulus and expected result for each case:
+[`planning/IRL_TEST_MATRIX.md`](planning/IRL_TEST_MATRIX.md). GPIO map and jig
+wiring: [`firmware/README.md`](firmware/README.md).
+
+### BOM and parts review
+
+- [ ] Confirm the BOM matches T1-Core architecture and the USB-C bus-power assumption
+- [ ] Every BOM line has two independent sources or a documented alternate footprint
+- [ ] Availability, lead time and footprint compatibility for all parts
+- [ ] Flag single-source or high-risk parts before schematic signoff
+- [ ] Confirm the C6 module and USB connector match the intended radio and power plan
+
+### Schematic and board validation
+
+- [ ] Create the KiCad project under `hardware/t1-core/`
+- [ ] CC1 and CC2 each terminate through 5.1 kΩ — omitting these produces a
+      board that works on a legacy A-to-C cable and draws nothing from a
+      compliant Type-C source
+- [ ] 3.3 V LDO rated ≥ 600 mA against a Wi-Fi transmit peak near 350 mA
+- [ ] Antenna keepout per the module datasheet: no copper, no pour, board edge
+- [ ] Contact-input RC network and ESD strategy
+- [ ] SK6812 indicator on the 3.3 V rail, so no level shifter is needed
+- [ ] `kibot` ERC and DRC exit 0 — milestone assertion 4
+- [ ] BOM checked against the netlist and footprint mapping
 
 ### Enclosure and integration
 
-- [ ] Review the board outline against fit and mounting assumptions
-- [ ] Publish or update apothecary-side geometry and envelope integration
-- [ ] Keep all printable geometry in `quaternionmedia/apothecary` as required
-- [ ] Validate fit between board, case, USB, and indicator opening
+- [x] Publish apothecary-side geometry — `datum-core`, tray and lid
+- [x] `apothecary parts info datum-core` returns non-null bounds, STL exits 0 —
+      milestone assertion 5
+- [ ] Re-fit every assumed dimension against the real board outline
+- [ ] Validate fit between board, case, USB opening and indicator opening
+- [ ] Confirm the indicator is visible through its opening on a printed part
 
-### Release and QA
+### Governance and compliance
 
-- [ ] Re-run docs/tests after hardware changes are made
-- [ ] Verify the MQTT contract still passes with the actual device output
-- [ ] Review local build outputs and fabrication artifacts for reproducibility
-- [ ] Confirm no open governance or Q-number escalations remain unresolved
+- [ ] **Q3, hardware licensing** — a missing org mechanism, not a choice of
+      venue. Needs a human. No dependency report can see a `.kicad_sch`
+- [ ] Dependency-manifest licence gate wired — milestone assertion 6's other half
+- [ ] Confirm REUSE compliance holds once hardware artifacts land
+- [ ] All work stays on a branch and under PR flow per `AGENTS.md`
+- [ ] No open question in `HANDOFF.md` §2 decided by stealth
 
-## Suggested HIL review order
+## Suggested review order
 
-1. BOM and design assumptions
-2. Schematic and ERC/DRC pass
-3. Firmware bring-up and MQTT validation
-4. Board fit and enclosure review
-5. Compliance and release signoff
-
-## Verified local command
-
-```bash
-cd /c/Users/peter/Documents/repos/qm/datum
-uv run pytest
-```
-
-Observed result at last check: `11 passed, 1 skipped in 12.46s`.
+1. Run `demo/hil.py` and read the table
+2. Push, so CI compiles the firmware for the first time
+3. BOM and design assumptions
+4. Schematic, ERC/DRC
+5. Flash a devkit, work IRL-001 through IRL-007
+6. Board fit against the printed enclosure
+7. Compliance and release signoff

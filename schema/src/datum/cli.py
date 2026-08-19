@@ -39,7 +39,7 @@ def emit(out: Path) -> None:
 
 
 @cli.command()
-@click.argument("path", type=click.Path(exists=True, path_type=Path))
+@click.argument("path", type=click.Path(exists=True, allow_dash=True, path_type=Path))
 @click.option(
     "--report",
     type=click.Path(path_type=Path),
@@ -52,8 +52,20 @@ def validate(path: Path, report: Path | None) -> None:
     Accepts a single event object or an array of them. An array is additionally
     checked for monotonic ``seq``, which is a property of a sequence and which
     no single-event schema can express.
+
+    ``-`` reads stdin, so a live capture can be checked without landing in a
+    file first: ``mosquitto_sub -C 1 -t 'datum/+/+/event' | datum validate -``.
     """
-    data = json.loads(path.read_text(encoding="utf-8"))
+    source = "<stdin>" if str(path) == "-" else str(path)
+    raw = sys.stdin.read() if str(path) == "-" else path.read_text(encoding="utf-8")
+
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        # A truncated capture is the common case here, and "Expecting value:
+        # line 1 column 1" on its own does not say which input was bad.
+        click.echo(f"{source}: not JSON: {exc}", err=True)
+        sys.exit(1)
     payloads = data if isinstance(data, list) else [data]
 
     failures = [i for i, payload in enumerate(payloads) if not accepts(payload)]
@@ -71,7 +83,7 @@ def validate(path: Path, report: Path | None) -> None:
 
     if report is not None:
         doc = {
-            "path": str(path),
+            "path": source,
             "events": len(payloads),
             "schema_failures": failures,
             "monotonic_checked": isinstance(data, list),

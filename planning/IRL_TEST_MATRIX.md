@@ -15,6 +15,22 @@ This matrix is for first-device hardware-in-the-loop validation once BOM-backed 
 - Broker reachable via DATUM_BROKER
 - Local toolchain available in this repo
 
+## Before any of this
+
+Run `uv run python demo/hil.py`. Everything provable without hardware is proven
+there, and the cases below are what it reports as still open. Starting here
+means a failure at the bench is a hardware or firmware finding rather than
+something that was already broken on the desk.
+
+## Retention is only observable if you arrive late
+
+IRL-005 through IRL-007 all depend on this and it is the thing that surprises
+people. MQTT clears the retain flag when delivering to a subscription that was
+*already established*. A subscriber watching the publish happen sees `retain=0`
+even for a message the broker retained. So every retention case has to be
+checked by a subscriber that connects **after** the publish, which is exactly
+the consumer the rule exists for.
+
 ## Evidence artifacts
 
 - CLI report: `schema/build/reports/<case>.json` via `datum validate --report`
@@ -29,9 +45,9 @@ This matrix is for first-device hardware-in-the-loop validation once BOM-backed 
 | IRL-002 | Event schema | Hold then release | Two valid events with expected actions | `uv run datum validate schema/build/captures/irl-002-hold-release.json --report schema/build/reports/irl-002-hold-release.json` |
 | IRL-003 | Sequence rule | Ordered multi-press | Array validates and monotonic sequence passes | `uv run datum validate schema/build/captures/irl-003-seq-ok.json --report schema/build/reports/irl-003-seq-ok.json` |
 | IRL-004 | Sequence rule | Intentionally reordered replay sample | Validation fails with monotonic violation | `uv run datum validate schema/build/captures/irl-004-seq-bad.json --report schema/build/reports/irl-004-seq-bad.json` |
-| IRL-005 | Topic contract | Announce publish | Announce topic payload retained and replayed to late subscriber | `uv run python -c "from datum.harness import roundtrip; print('manual harness step in docs/wire.md')"` |
-| IRL-006 | Topic contract | Status publish | Status topic retained and replayed to late subscriber | `uv run python -c "from datum.harness import roundtrip; print('manual harness step in docs/wire.md')"` |
-| IRL-007 | Topic contract | Event publish | Event topic not retained for late subscriber | `uv run python -c "from datum.harness import roundtrip; print('manual harness step in docs/wire.md')"` |
+| IRL-005 | Topic contract | Announce publish | Announce topic payload retained and replayed to late subscriber | `mosquitto_sub -h $BROKER -t 'datum/lab/jig/announce' -C 1 -v` from a *late* subscriber, after the device booted |
+| IRL-006 | Topic contract | Status publish | Status topic retained and replayed to late subscriber | `mosquitto_sub -h $BROKER -t 'datum/lab/jig/status' -C 1 -v`, then pull power and repeat -- expect `offline` |
+| IRL-007 | Topic contract | Event publish | Event topic not retained for late subscriber | press, then `mosquitto_sub -h $BROKER -t 'datum/lab/jig/event' -W 3` -- expect nothing, and a timeout is the pass |
 
 ## Pass criteria
 
