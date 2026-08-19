@@ -16,12 +16,12 @@ uv sync          # install
 uv run pytest    # run the documentation
 ```
 
-The docs below are the test suite. Every `>>>` in `docs/` executes, and module
+The docs below are the test suite. Every `>>>` in `walkthrough/` executes, and module
 docstrings are collected too, so a claim that stops being true fails the build.
 There is no `tests/` directory, and adding one is a regression — see
 `AGENTS.md`.
 
-`docs/wire.md` needs a broker. Without one it skips with a stated reason:
+`walkthrough/08-wire.md` needs a broker. Without one it skips with a stated reason:
 
 ```
 docker run -d --rm -p 11883:1883 eclipse-mosquitto:2
@@ -30,17 +30,35 @@ uv run pytest
 
 ## Where to go
 
+The pages are ordinal and read in order. `01` through `07` are hermetic; `08`
+needs a broker and says so in its opening line.
+
 | | |
 |---|---|
-| [`docs/cookbook.md`](docs/cookbook.md) | Wire a switch, toggle a lamp, and watch a v1 consumer read a 2031 event. Start here |
-| [`docs/envelope.md`](docs/envelope.md) | The payload: required fields, optional axes, and where the compatibility guarantee lives |
-| [`docs/topic-contract.md`](docs/topic-contract.md) | Topics, what each carries, and which are retained |
-| [`docs/wire.md`](docs/wire.md) | The same contract over a real MQTT broker |
-| [`docs/firmware.md`](docs/firmware.md) | The seam between the ESPHome YAML and these constants |
-| [`docs/conformance.md`](docs/conformance.md) | The ten checked-in vectors and the two gates they take |
-| [`docs/cli.md`](docs/cli.md) | `datum version`, `validate`, `emit`, `hil` |
-| [`docs/hil.md`](docs/hil.md) | One command that proves everything provable without hardware, and names what is left |
-| [`schema/projections/README.md`](schema/projections/README.md) | Which axes each transport carries, and which it drops |
+| [`walkthrough/01-cookbook.md`](walkthrough/01-cookbook.md) | Wire a switch, toggle a lamp, and watch a v1 consumer read a 2031 event. Start here |
+| [`walkthrough/02-envelope.md`](walkthrough/02-envelope.md) | The payload: required fields, optional axes, and where the compatibility guarantee lives |
+| [`walkthrough/03-topic-contract.md`](walkthrough/03-topic-contract.md) | Topics, what each carries, and which are retained |
+| [`walkthrough/04-firmware.md`](walkthrough/04-firmware.md) | The seam between the ESPHome YAML and these constants |
+| [`walkthrough/05-conformance.md`](walkthrough/05-conformance.md) | The ten checked-in vectors and the two gates they take |
+| [`walkthrough/06-cli.md`](walkthrough/06-cli.md) | `datum version`, `validate`, `emit`, `hil` |
+| [`walkthrough/07-hil.md`](walkthrough/07-hil.md) | One command that proves everything provable without hardware, and names what is left |
+| [`walkthrough/08-wire.md`](walkthrough/08-wire.md) | The same contract over a real MQTT broker |
+
+That table is the registry's only rendering, and a rendering that disagrees
+with the directory is how a page stops being read. So it is checked rather
+than maintained:
+
+    >>> import re
+    >>> from datum.hil import find_repo_root
+    >>> root = find_repo_root()
+    >>> rows = [line for line in (root / "README.md").read_text(encoding="utf-8").splitlines()
+    ...         if line.startswith("| [`walkthrough/")]
+    >>> listed = [re.search(r"\(walkthrough/(.+?)\)", row).group(1) for row in rows]
+    >>> listed == sorted(page.name for page in (root / "walkthrough").glob("*.md"))
+    True
+
+Elsewhere: [`schema/projections/README.md`](schema/projections/README.md) says
+which axes each transport carries and which it drops.
 
 ## Not here yet
 

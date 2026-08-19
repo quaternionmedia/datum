@@ -12,12 +12,12 @@ uv run datum hil
 
 One command, no servers, nothing left running. It proves everything provable
 without hardware and prints the remaining IRL cases. See
-[`docs/hil.md`](docs/hil.md).
+[`walkthrough/07-hil.md`](walkthrough/07-hil.md).
 
 ## Proven, locally and repeatably
 
 - [x] `uv run pytest` — 25 collected, 24 passed, 1 skipped
-- [x] The skip is `docs/wire.md`, which needs a broker and says so
+- [x] The skip is `walkthrough/08-wire.md`, which needs a broker and says so
 - [x] Ten checked-in vectors: six accepted, four rejected, each leaving a report
 - [x] A v1-pinned consumer parses a capability-extended event and yields an
       identical `action` — milestone assertion 3, the one that matters

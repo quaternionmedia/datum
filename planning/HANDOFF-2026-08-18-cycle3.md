@@ -25,16 +25,16 @@ The BOM still blocks WP-4. `planning/lanes/blocks.md` now says which.
 | 0 | Cycle-2 work committed to a branch | `uv run pytest` -> 11 passed, 1 skipped |
 | 1 | `firmware/t1-core.yaml`, `firmware/contact.yaml`, `firmware/README.md` | not compiled locally; see below |
 | 2 | `.github/workflows/firmware.yml` | not yet run; needs a pull request |
-| 3 | `docs/firmware.md`, `schema/src/datum/firmware.py` | `uv run pytest` -> 19 passed, 1 skipped |
+| 3 | `walkthrough/04-firmware.md`, `schema/src/datum/firmware.py` | `uv run pytest` -> 19 passed, 1 skipped |
 | 4 | State docs, lanes, decisions | this file |
 
 ## What Phase 3 is, and why it is the load-bearing part
 
-`docs/wire.md` states the failure its broker harness cannot reach: a topic that
+`walkthrough/08-wire.md` states the failure its broker harness cannot reach: a topic that
 is right in the constant and wrong in the firmware. A broker only sees what it
 was sent, so round-tripping never finds it.
 
-`docs/firmware.md` compares the two directly and fails the build on drift:
+`walkthrough/04-firmware.md` compares the two directly and fails the build on drift:
 
 - the topic suffixes in the YAML against `datum.topics`
 - the firmware's own payload templates, filled in Python, byte for byte against
@@ -54,7 +54,7 @@ cd /c/Users/peter/Documents/repos/qm/datum
 uv run pytest
 ```
 
-- `19 passed, 1 skipped` (`docs/wire.md` skipped, no local broker)
+- `19 passed, 1 skipped` (`walkthrough/08-wire.md` skipped, no local broker)
 - Baseline at session start was `11 passed, 1 skipped`
 
 ```bash

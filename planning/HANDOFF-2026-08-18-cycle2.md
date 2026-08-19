@@ -17,7 +17,7 @@ Execute what is possible locally now, using a lane-based dual-repo dev loop, and
 ### Datum files changed this session
 
 - `schema/src/datum/cli.py`
-- `docs/cli.md`
+- `walkthrough/06-cli.md`
 - `HIL_REVIEW_CHECKLIST.md`
 - `planning/DEV_LOOP.md`
 - `planning/IRL_TEST_MATRIX.md`
@@ -78,7 +78,7 @@ Risk notes:
 
 Local `git status --short` at handoff capture:
 
-- `M docs/cli.md`
+- `M walkthrough/06-cli.md`
 - `M schema/src/datum/cli.py`
 - `?? HIL_REVIEW_CHECKLIST.md`
 - `?? planning/`

@@ -1,6 +1,6 @@
 """Collection gate for the wire cookbook.
 
-`docs/wire.md` documents behaviour that only exists over a real broker. Without
+`walkthrough/08-wire.md` documents behaviour that only exists over a real broker. Without
 one it is skipped with a stated reason rather than failing or being dropped
 silently.
 
@@ -12,7 +12,9 @@ from pathlib import Path
 
 import pytest
 
-WIRE_COOKBOOK = "wire.md"
+# Matched by suffix, so renumbering the page cannot silently detach the gate
+# and turn a skip into a connection error.
+WIRE_COOKBOOK_SUFFIX = "wire.md"
 
 
 def pytest_collection_modifyitems(config, items):
@@ -29,5 +31,5 @@ def pytest_collection_modifyitems(config, items):
     )
     skip = pytest.mark.skip(reason=reason)
     for item in items:
-        if Path(str(item.fspath)).name == WIRE_COOKBOOK:
+        if Path(str(item.fspath)).name.endswith(WIRE_COOKBOOK_SUFFIX):
             item.add_marker(skip)

@@ -1,6 +1,6 @@
 name: Firmware
 
-# Builds the ESPHome configuration. `docs/firmware.md` checks that the topics
+# Builds the ESPHome configuration. `walkthrough/04-firmware.md` checks that the topics
 # and payloads in that YAML match the Python constants, but it does not run
 # ESPHome, so it cannot tell you the configuration compiles. This job is the
 # other half: a lambda that does not compile, a component that does not exist

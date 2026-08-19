@@ -326,7 +326,7 @@ datum/
 ├── schema/                     # the seam
 ├── firmware/                   # ESPHome packages + external components
 ├── hardware/t1-core/           # KiCad 9
-├── docs/                       # the executable reference; README.md is an onramp
+├── walkthrough/                # the executable pages; README.md is an onramp
 └── README.md, AGENTS.md, HANDOFF.md
 ```
 

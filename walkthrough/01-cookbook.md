@@ -1,5 +1,7 @@
 # Cookbook — a switch for a light that has no switch
 
+**Hermetic.**
+
 Executable. Every `>>>` runs under `uv run pytest`.
 
 Runs on a laptop: no board, no broker, no bulb. `Bus` is an in-process fixture
@@ -8,7 +10,7 @@ automation platform subscribing on its behalf. `Contact` is the half this
 project builds — the dry contact, debounced, emitting the envelope.
 
 `Bus` must never grow into an MQTT implementation. The broker is an engine
-(`AGENTS.md`, "Non-negotiables"); `docs/wire.md` runs the same contract against
+(`AGENTS.md`, "Non-negotiables"); `walkthrough/08-wire.md` runs the same contract against
 a real one.
 
 ## Wiring a dumb momentary switch

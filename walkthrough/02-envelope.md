@@ -1,5 +1,7 @@
 # The envelope
 
+**Hermetic.**
+
 The versioned payload every transport carries. Executable under
 `uv run pytest`.
 

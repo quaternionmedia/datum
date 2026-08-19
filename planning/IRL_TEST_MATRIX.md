@@ -52,7 +52,7 @@ the consumer the rule exists for.
 ## Pass criteria
 
 - Required schema tests IRL-001..IRL-004 pass/fail exactly as expected.
-- Retention contract in IRL-005..IRL-007 matches `docs/topic-contract.md`.
+- Retention contract in IRL-005..IRL-007 matches `walkthrough/03-topic-contract.md`.
 - Every test case produces a report artifact and capture file.
 
 ## Failure handling

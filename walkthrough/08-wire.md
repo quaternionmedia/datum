@@ -1,5 +1,7 @@
 # The wire
 
+**Runtime-bound** — needs an MQTT broker.
+
 `README.md` proves the envelope and the contract in-process. This file proves
 them over a real broker, and it is collected only when one is reachable.
 

@@ -29,7 +29,7 @@ Rewritten in block style. `esphome config` now reports the configuration valid
 on ESPHome 2026.7.4, and the rendered output confirms the wire contract:
 `topic_prefix: ''`, birth and will on `datum/lab/jig/status` retained, and both
 payload templates intact inside their raw string literals. One warning, GPIO8
-is a strapping pin, which is the deliberate one `docs/firmware.md` documents.
+is a strapping pin, which is the deliberate one `walkthrough/04-firmware.md` documents.
 
 ### 2. Apothecary could not start on Windows
 
@@ -60,7 +60,7 @@ str_sprintf(R"({"src":"%s","seq":%u,...,"ch":%d})", ..., seq->value()++, action.
 
 ESPHome coerces correctly. One real nit: `ch` is a signed `int` and was being
 fed to `%u`. It carries `%d` now, and the byte-identity check in
-`docs/firmware.md` still passes — which is the drift gate doing its job.
+`walkthrough/04-firmware.md` still passes — which is the drift gate doing its job.
 
 ## Cross-repo work: the enclosure
 
@@ -86,7 +86,7 @@ uv run pytest
 uv run --with esphome esphome config firmware/t1-core.yaml
 ```
 
-- `19 passed, 1 skipped` (`docs/wire.md` skipped, no local broker)
+- `19 passed, 1 skipped` (`walkthrough/08-wire.md` skipped, no local broker)
 - `INFO Configuration is valid!` on ESPHome 2026.7.4
 - `reuse lint` compliant, 59 / 59 files
 

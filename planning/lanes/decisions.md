@@ -78,12 +78,12 @@ Record high-discipline decisions with context and consequences.
 - Scope: Datum
 - Decision: Keep every wire-critical string in the firmware's `substitutions:`
   block, and build payloads from printf templates rather than a JSON library.
-- Why now: docs/wire.md names a topic that is right in Python and wrong in the
+- Why now: walkthrough/08-wire.md names a topic that is right in Python and wrong in the
   firmware as the failure its broker harness cannot reach. Literals in a
   substitutions block can be read back as text and compared to the constants;
   literals buried in a lambda cannot, and a JSON library's spacing and key
   order are not ours to fix.
-- Evidence: docs/firmware.md fills the firmware's own templates in Python and
+- Evidence: walkthrough/04-firmware.md fills the firmware's own templates in Python and
   they match Event.wire_json() and Announce.wire_json() byte for byte.
 - Consequences: Renaming a topic suffix or reordering an envelope field turns
   the build red until the firmware is changed with it. The firmware may not
@@ -152,7 +152,7 @@ Record high-discipline decisions with context and consequences.
   values are 0..3 so nothing is gained by the unsigned specifier.
 - Evidence: `firmware/.esphome/build/.../main.cpp` shows
   `StatelessLambdaAction<int, std::string>` and `set_args` returning `int`.
-  The byte-identity check in docs/firmware.md still passes.
+  The byte-identity check in walkthrough/04-firmware.md still passes.
 - Consequences: None on the wire. The bytes are unchanged.
 - Follow-up: None.
 - Governance impact: none
@@ -195,7 +195,7 @@ Record high-discipline decisions with context and consequences.
   set already covers. A new top-level directory also sits outside the work
   package path table in `AGENTS.md`.
 - Evidence: `uv run datum hil` -> 6 proved, 0 failed, 1 skipped. `datum --help`
-  lists it. `docs/hil.md` is the reference and carries its own doctests.
+  lists it. `walkthrough/07-hil.md` is the reference and carries its own doctests.
 - Consequences: One surface rather than two. The runner ships with the package,
   so it degrades honestly outside a checkout rather than crashing — it looks
   for `pyproject.toml` and `schema/vectors` and says what it needs.
@@ -209,7 +209,7 @@ Record high-discipline decisions with context and consequences.
 - Why now: A case added to the matrix and not to the runner, or the reverse, is
   a case nobody runs. That is the same drift the firmware seam gate exists to
   catch, applied to the review checklist instead of the wire.
-- Evidence: `docs/hil.md` compares `irl_case_ids()` to every `IRL-NNN` found in
+- Evidence: `walkthrough/07-hil.md` compares `irl_case_ids()` to every `IRL-NNN` found in
   `planning/IRL_TEST_MATRIX.md`, and it runs under `uv run pytest`.
 - Consequences: The seven cases cannot silently disagree.
 - Follow-up: None.

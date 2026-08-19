@@ -115,14 +115,14 @@ def hil(broker: str | None) -> None:
     the IRL cases only a board on a bench can close. Starts nothing, and
     leaves nothing running.
 
-    This is not the test suite -- ``uv run pytest`` is. See ``docs/hil.md``.
+    This is not the test suite -- ``uv run pytest`` is. See ``walkthrough/07-hil.md``.
     """
     from datum.hil import MARK, NEEDS_HARDWARE, find_repo_root, parse_broker, run_all
 
     root = find_repo_root()
     if root is None:
         raise click.ClickException(
-            "run this from a datum checkout: it needs schema/vectors, docs/ and firmware/"
+            "run this from a datum checkout: it needs schema/vectors, walkthrough/ and firmware/"
         )
 
     steps = run_all(root, parse_broker(broker or os.environ.get("DATUM_BROKER")))

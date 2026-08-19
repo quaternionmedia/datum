@@ -1,7 +1,9 @@
 # The firmware
 
+**Hermetic.**
+
 `firmware/t1-core.yaml` is stock ESPHome on an ESP32-C6. It reads four dry
-contacts and publishes the envelope on the topics `docs/topic-contract.md`
+contacts and publishes the envelope on the topics `walkthrough/03-topic-contract.md`
 documents. This page is the seam between that YAML and the Python: every
 string the firmware puts on the wire is checked here against the constant a
 consumer compiles against.
@@ -11,7 +13,7 @@ consumer compiles against.
     >>> from datum.firmware import config_text, contact_pins, emitted_actions
     >>> from datum.firmware import RESERVED_GPIO, substitution
 
-`docs/wire.md` proves the contract over a real broker, and names the one
+`walkthrough/08-wire.md` proves the contract over a real broker, and names the one
 failure that harness cannot reach: a topic that is right in the constant and
 wrong in the firmware. A broker sees only what it is sent. Catching that needs
 the firmware and the constant compared directly, which is what follows.
@@ -55,7 +57,7 @@ produces:
     ... ) == announce.wire_json()
     True
 
-`docs/wire.md` compares the round-tripped payload byte for byte rather than
+`walkthrough/08-wire.md` compares the round-tripped payload byte for byte rather than
 field by field, because a comparison that re-parses both sides passes on an
 encoding change that breaks every consumer that does not re-parse. The same
 argument applies one layer earlier, here, where the bytes are written.

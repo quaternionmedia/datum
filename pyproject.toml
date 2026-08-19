@@ -34,10 +34,10 @@ build-backend = "hatchling.build"
 packages = ["schema/src/datum"]
 
 # The documentation IS the test suite. Everything pytest collects here is prose
-# with executable examples in it: the cookbook, and the docstrings that explain
+# with executable examples in it: the walkthrough, and the docstrings that explain
 # the contract at the point of use. A claim that stops being true fails the
 # build rather than going stale. There is nowhere to write an untested example.
 [tool.pytest.ini_options]
 addopts = "--doctest-glob=*.md --doctest-modules -q"
-testpaths = ["README.md", "docs", "schema/src/datum"]
+testpaths = ["README.md", "walkthrough", "schema/src/datum"]
 doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]

@@ -1,5 +1,7 @@
 # The pre-HIL run
 
+**Hermetic.**
+
 One command. It proves everything this project can prove without hardware,
 writes the report artifacts, and then names the cases a board on a bench is the
 only way to close.
@@ -30,7 +32,7 @@ Datum -- pre-HIL proof run
 Exit status is 0 only if nothing that ran failed. **A skip is never counted as
 a pass**, and every skip is repeated at the end with its reason — a skipped
 assertion reported as green is the failure mode this whole layout exists to
-prevent, and `docs/wire.md` already says so about itself.
+prevent, and `walkthrough/08-wire.md` already says so about itself.
 
 ## What each line is
 
@@ -53,7 +55,7 @@ docker run -d --rm -p 11883:1883 eclipse-mosquitto:2
 uv run datum hil --broker 127.0.0.1:11883
 ```
 
-`DATUM_BROKER` works too — the same variable `docs/wire.md` reads, so a bench
+`DATUM_BROKER` works too — the same variable `walkthrough/08-wire.md` reads, so a bench
 with one already exported needs no argument:
 
     >>> from datum.hil import parse_broker
@@ -99,7 +101,7 @@ GPIO map, and how to wire the T0 contact jig.
 
 ## What this is not
 
-Not the test suite. `uv run pytest` is, and it runs every example under `docs/`
+Not the test suite. `uv run pytest` is, and it runs every example under `walkthrough/`
 plus the module docstrings. This orchestrates across two repositories and a
 firmware toolchain, which no doctest can reach — so the orchestration lives in
 `datum.hil` and the pieces that *can* be checked in-process carry their own

@@ -24,7 +24,7 @@ clause 2).
 `main` is pushed and is the published state; work reaches it as pull requests.
 
 WP-3's configuration exists and `esphome config` reports it valid on ESPHome
-2026.7.4; `docs/firmware.md` checks its topics and payloads against the
+2026.7.4; `walkthrough/04-firmware.md` checks its topics and payloads against the
 constants. The compile itself has not been proven anywhere yet — `esphome
 compile` reaches codegen and then fails installing the ESP-IDF framework on
 Windows, so `firmware.yml` on Linux is what settles it. **Nothing has been
@@ -52,7 +52,7 @@ What exists:
    real broker and validates. Qualified: the captured event is a stand-in
    written against the contract until WP-3 produces a real capture. Everything
    else in that path — topic, encoding, retention, schema validation — runs
-   against Mosquitto over a socket. `docs/firmware.md` narrows what the
+   against Mosquitto over a socket. `walkthrough/04-firmware.md` narrows what the
    stand-in is standing in for: the bytes the firmware would send are checked
    against the bytes the stand-in carries, so the remaining gap is the device
    and the contact, not the payload.
@@ -74,19 +74,19 @@ models none of this, which is the argument for the harness in one paragraph.
 must never grow into an MQTT implementation. The broker is an engine.
 
 **The documentation is the test suite.** `pytest` executes every example under
-`docs/`, plus the module docstrings, so there is nowhere to write an example
+`walkthrough/`, plus the module docstrings, so there is nowhere to write an example
 that is not checked. There is no `tests/` directory and there should not be
 one: a claim that stops being true fails the build instead of going stale.
 
-`README.md` is a shallow onramp and a table of contents. `docs/` carries the
+`README.md` is a shallow onramp and a table of contents. `walkthrough/` carries the
 executable reference: `cookbook.md`, `envelope.md`, `topic-contract.md`,
 `conformance.md`, `cli.md`, `wire.md`. Every one of them is a test.
 `governance/qm/handbook/style-guide.md` is the rule that puts them there, and
 the same rule keeps explanation out of them — inline comments carry clarifying
-facts, `docs/` carries the contract, and a why belongs in a record or a
+facts, `walkthrough/` carries the contract, and a why belongs in a record or a
 retrospective.
 
-`docs/wire.md` is separate from the rest for one reason: it needs a broker.
+`walkthrough/08-wire.md` is separate from the rest for one reason: it needs a broker.
 Without one it is skipped with a stated reason and everything else still runs.
 An external prerequisite for part of a suite is house-normal — apothecary's
 own tests need the `openscad` CLI and browser binaries — but the skip is
@@ -99,7 +99,7 @@ single-event JSON Schema can express a relationship between one payload and the
 one before it. Each event in that fixture is individually valid and should be.
 The invariant is real, so it is enforced by a stateful check (`is_monotonic`)
 and by `datum validate` on an array. Two kinds of guarantee, two kinds of gate,
-both demonstrated in `docs/conformance.md`. A schema asserted to reject all
+both demonstrated in `walkthrough/05-conformance.md`. A schema asserted to reject all
 four would be a fabricated test.
 
 Verified against a real fresh clone, not asserted: `CLAUDE.md` and
@@ -355,7 +355,7 @@ guarantees.
 **Goal:** the documented wire contract, and a way to prove firmware conforms
 without a lab.
 
-**Path:** `schema/topics.py`, `docs/topic-contract.md`, `tests/harness/`
+**Path:** `schema/topics.py`, `walkthrough/03-topic-contract.md`, `tests/harness/`
 
 **Deliverables:**
 
@@ -486,7 +486,7 @@ apothecary version renders each part it depends on.
   containers). The org open-license record provides for this explicitly.
 - REUSE compliance: SPDX identifiers on every file, `LICENSES/` holding full
   texts. CERN-OHL-S-2.0 for `hardware/`, MIT for `schema/` and `firmware/`,
-  CC-BY-SA-4.0 for `docs/`.
+  CC-BY-SA-4.0 for `walkthrough/`.
 - CI fails on an unlicensed file or a non-allowlisted dependency license.
 
 **Acceptance (M1 assertion 6):** both gates report zero violations.
@@ -568,7 +568,7 @@ governance and therefore where they belong:
 | The fork procedure's symlink-copy guidance is wrong on Windows | `perspectives/2026-08-08-hardware-onramp-invisible-artifacts.md` |
 | The open-license record's enforcement cannot see hardware artifacts | Same perspective, with a proposed org amendment. Q3 above |
 | Gate *absence* is undetectable, and the corpus demonstrates it on itself | Same perspective |
-| The topic contract's retention terms have no record | Named in `docs/topic-contract.md`; drafting one is open work |
+| The topic contract's retention terms have no record | Named in `walkthrough/03-topic-contract.md`; drafting one is open work |
 
 Per the org record a capability gap closes upstream, which is what those
 perspectives are. A private workaround would be a debt against the commons this

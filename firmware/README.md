@@ -9,8 +9,8 @@ is USB-C bus powered and always on.
 | `t1-core.yaml` | The device configuration. Every wire-critical string lives in its `substitutions:` block |
 | `contact.yaml` | One contact, included four times with a different channel and pin |
 
-The contract these files implement is in [`docs/topic-contract.md`](../docs/topic-contract.md).
-The check that they still implement it is [`docs/firmware.md`](../docs/firmware.md),
+The contract these files implement is in [`walkthrough/03-topic-contract.md`](../walkthrough/03-topic-contract.md).
+The check that they still implement it is [`walkthrough/04-firmware.md`](../walkthrough/04-firmware.md),
 which reads the topics and payloads back out of the YAML and compares them to
 the Python constants. It runs under `uv run pytest` with everything else.
 

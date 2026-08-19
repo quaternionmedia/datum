@@ -44,19 +44,28 @@ closed; the rest are for a human.
       record's context paragraph already anticipates exactly this case and says
       how to answer it. Nothing here is blocked on it.
 
-- [ ] **`DRAFT-one-executable-walkthrough.md` now governs this repository and
-      it is not complied with.** It arrived in the propagation this pin bump
+- [x] **`DRAFT-one-executable-walkthrough.md` now governs this repository.**
+      Migrated: `docs/` is `walkthrough/`, pages are `NN-<slug>.md` in reading
+      order, each declares its runtime in its opening line (01-07 hermetic,
+      08 runtime-bound on a broker), the CI invocation names the directory
+      explicitly rather than relying on `testpaths`, and the README table is
+      checked against the directory instead of hand-maintained. Clause 7 is
+      the one part that cannot be satisfied locally: it asks for the
+      identifier of a job run on the default branch, and nothing is pushed.
+      Original finding follows.
+
+      **What it required.** It arrived in the propagation this pin bump
       picked up. Clause 1: every QM repository carries exactly one
       `walkthrough/` at its root, pages `NN-<slug>.md`, and it is the single
       path for development, onboarding and communication. This project's
-      executable pages are in `docs/`. Clause 2 also requires the test command
+      executable pages are in `walkthrough/`. Clause 2 also requires the test command
       to name the directory explicitly rather than rely on `testpaths`, which
       is precisely how `pyproject.toml` wires it today — the record measured
       that `testpaths` is ignored the moment pytest receives a path argument,
       so pages wired that way are collected by nobody and stay green forever.
       The record cites this project by name as the existence proof that the
       mechanism costs configuration rather than a toolchain. Next action:
-      migrate `docs/` to `walkthrough/` and name it in the CI invocation.
+      migrate `walkthrough/` to `walkthrough/` and name it in the CI invocation.
 
 - [ ] **The pin was stale enough to change conclusions, and nothing reported
       it.** `submodule-check` is one of the three seed CI workflows and it did

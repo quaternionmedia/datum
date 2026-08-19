@@ -1,5 +1,7 @@
 # The CLI
 
+**Hermetic.**
+
 Executable under `uv run pytest`.
 
     >>> from click.testing import CliRunner
@@ -17,7 +19,7 @@ The schema version, not the package version.
 ## `datum validate`
 
 Takes a single event or an array. Given an array it also checks the sequence
-invariant, which no schema can express — see `docs/conformance.md`.
+invariant, which no schema can express — see `walkthrough/05-conformance.md`.
 
     >>> ok = run.invoke(cli, ["validate", str(vectors_dir() / "valid" / "6-all-axes.json")])
     >>> ok.exit_code

@@ -6,7 +6,7 @@ on a bench is the only way to close. It starts nothing and leaves nothing
 running.
 
 This is not the test suite. ``uv run pytest`` is, and it runs every example
-under ``docs/`` plus these docstrings. This orchestrates across two
+under ``walkthrough/`` plus these docstrings. This orchestrates across two
 repositories and a firmware toolchain, which no doctest can reach — so what
 lives here is the orchestration, and the pieces that can be checked in-process
 carry their own examples below.
@@ -26,7 +26,7 @@ from pathlib import Path
 DEFAULT_MQTT_PORT = 1883
 
 # The cases nothing on a desk can close. Kept beside the runner so the list a
-# reviewer is told to work through is the list the code prints; docs/hil.md
+# reviewer is told to work through is the list the code prints; walkthrough/07-hil.md
 # checks these against planning/IRL_TEST_MATRIX.md.
 NEEDS_HARDWARE: tuple[tuple[str, str], ...] = (
     ("IRL-001", "Single press emits one event, action=single"),
@@ -221,7 +221,7 @@ def step_wire(root: Path, broker: tuple[str, int] | None) -> Step:
     """Topic, encoding and retention, over a real broker."""
     s = Step("Wire contract", "topics, retention, and a late subscriber")
     if broker is None:
-        return s.skipped("DATUM_BROKER not set -- see docs/hil.md for the one docker line")
+        return s.skipped("DATUM_BROKER not set -- see walkthrough/07-hil.md for the one docker line")
     host, port = broker
     if not reachable(host, port):
         return s.skipped(f"nothing accepting connections on {host}:{port}")
@@ -229,7 +229,7 @@ def step_wire(root: Path, broker: tuple[str, int] | None) -> Step:
     env_before = os.environ.get("DATUM_BROKER")
     os.environ["DATUM_BROKER"] = f"{host}:{port}"
     try:
-        result = _run([sys.executable, "-m", "pytest", "docs/wire.md", "-q", "-rs"], root)
+        result = _run([sys.executable, "-m", "pytest", "walkthrough/08-wire.md", "-q", "-rs"], root)
     finally:
         if env_before is None:
             os.environ.pop("DATUM_BROKER", None)
@@ -252,7 +252,7 @@ def step_firmware(root: Path) -> Step:
     elif shutil.which("uv"):
         args = ["uv", "run", "--with", "esphome", "esphome", "config", "firmware/t1-core.yaml"]
     else:
-        return s.skipped("neither esphome nor uv on PATH -- see docs/hil.md")
+        return s.skipped("neither esphome nor uv on PATH -- see walkthrough/07-hil.md")
 
     result = _run(args, root, timeout=900)
     if result.returncode != 0:
@@ -263,7 +263,7 @@ def step_firmware(root: Path) -> Step:
 def step_firmware_seam(root: Path) -> Step:
     """The check that the YAML and the Python constants still agree."""
     s = Step("Firmware seam", "topics and payloads read back out of the YAML")
-    result = _run([sys.executable, "-m", "pytest", "docs/firmware.md", "-q"], root)
+    result = _run([sys.executable, "-m", "pytest", "walkthrough/04-firmware.md", "-q"], root)
     if result.returncode != 0:
         return s.failed(tail_of(result))
     return s.passed("YAML and constants agree")

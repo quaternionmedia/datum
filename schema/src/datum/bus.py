@@ -1,12 +1,12 @@
 """An in-process stand-in for the broker, implementing the topic contract.
 
-Makes the contract's retention semantics executable in ``docs/cookbook.md``
+Makes the contract's retention semantics executable in ``walkthrough/01-cookbook.md``
 with no broker running. It is **not** an MQTT implementation and must never
 become one: the broker is an engine this project selects rather than writes.
 
 It models delivery and retention only. A real broker also clears the retain
 flag when delivering to an already-established subscription, which this does
-not reproduce — ``datum.harness`` and ``docs/wire.md`` cover that against a
+not reproduce — ``datum.harness`` and ``walkthrough/08-wire.md`` cover that against a
 live Mosquitto.
 """
 

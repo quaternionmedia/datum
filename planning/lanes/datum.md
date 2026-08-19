@@ -15,7 +15,7 @@ Advance schema-to-firmware-to-HIL readiness with verifiable local checkpoints.
 
 - [x] Define post-BOM IRL test matrix (event validity, topic contract, retained semantics).
 - [x] Author the WP-3 ESPHome configuration for the ESP32-C6 devkit.
-- [x] Gate firmware/Python wire drift as an executable check (`docs/firmware.md`).
+- [x] Gate firmware/Python wire drift as an executable check (`walkthrough/04-firmware.md`).
 - [x] Build the firmware configuration in CI (`.github/workflows/firmware.yml`).
 - [x] Validate the configuration locally: `esphome config` on ESPHome 2026.7.4.
 - [ ] Confirm the CI firmware build is green. `esphome compile` fails on this
@@ -32,7 +32,7 @@ Advance schema-to-firmware-to-HIL readiness with verifiable local checkpoints.
 
 - IRL test matrix: planning/IRL_TEST_MATRIX.md
 - Firmware: firmware/t1-core.yaml, firmware/contact.yaml, firmware/README.md
-- Drift gate: docs/firmware.md, schema/src/datum/firmware.py
+- Drift gate: walkthrough/04-firmware.md, schema/src/datum/firmware.py
 
 ## Evidence log
 
@@ -42,7 +42,7 @@ Advance schema-to-firmware-to-HIL readiness with verifiable local checkpoints.
 - 2026-08-18: added planning/IRL_TEST_MATRIX.md for post-BOM first-device validation.
 - 2026-08-18: `uv run pytest` -> 11 passed, 1 skipped.
 - 2026-08-18: added firmware/t1-core.yaml and firmware/contact.yaml (WP-3).
-- 2026-08-18: added docs/firmware.md; firmware topics and payloads verified
+- 2026-08-18: added walkthrough/04-firmware.md; firmware topics and payloads verified
   byte-identical to datum.topics and Event/Announce.wire_json().
 - 2026-08-18: `uv run pytest` -> 19 passed, 1 skipped.
 - 2026-08-18: `reuse lint` -> compliant, 59/59 files covered, no REUSE.toml change needed.

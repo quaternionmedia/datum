@@ -1,12 +1,12 @@
 """Read the wire-critical literals back out of the ESPHome configuration.
 
-``docs/wire.md`` names the failure an in-process fixture cannot see: a topic
+``walkthrough/08-wire.md`` names the failure an in-process fixture cannot see: a topic
 that is right in the constant and wrong in the firmware. A real broker catches
 it only once real firmware is flashed and someone is standing next to it.
 
 The firmware keeps every string that reaches the wire in its ``substitutions:``
 block rather than buried in a lambda, so this module can read them back as text
-and ``docs/firmware.md`` can check them against the same constants a consumer
+and ``walkthrough/04-firmware.md`` can check them against the same constants a consumer
 compiles against. Nothing here parses YAML: the values under test are literal
 wire strings, and reading them as text is what the check is about.
 

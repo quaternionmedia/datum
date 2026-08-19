@@ -5,7 +5,7 @@ the topic helpers, the conformance vector loaders, and the two stand-ins the
 cookbook drives — ``Bus`` for the broker and ``Lamp`` for a subscribing
 consumer.
 
-``docs/cookbook.md`` is the worked example; ``docs/envelope.md`` documents the
+``walkthrough/01-cookbook.md`` is the worked example; ``walkthrough/02-envelope.md`` documents the
 payload.
 """
 

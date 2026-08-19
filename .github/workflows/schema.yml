@@ -1,6 +1,6 @@
 name: Schema
 
-# Runs the documentation. README.md, docs/ and the module docstrings are the
+# Runs the documentation. README.md, walkthrough/ and the module docstrings are the
 # whole test suite -- there is no tests/ directory by design, so this job is
 # what stands between a claim in the docs and it quietly becoming false.
 #
@@ -51,7 +51,10 @@ jobs:
           echo "no broker on 11883 after 30s; the wire cookbook would be skipped"; exit 1
 
       - name: Run the documentation
-        run: uv run pytest -rs
+        # The walkthrough directory is named explicitly rather than left to
+        # testpaths: pytest ignores testpaths the moment it receives a path
+        # argument, so a walkthrough reached only that way is one nobody runs.
+        run: uv run pytest walkthrough README.md schema/src/datum -rs
 
       - name: Emit the JSON Schema artifact
         run: uv run datum emit
