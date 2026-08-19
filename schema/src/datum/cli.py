@@ -40,7 +40,13 @@ def emit(out: Path) -> None:
 
 @cli.command()
 @click.argument("path", type=click.Path(exists=True, path_type=Path))
-def validate(path: Path) -> None:
+@click.option(
+    "--report",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Write a JSON validation report to this path.",
+)
+def validate(path: Path, report: Path | None) -> None:
     """Validate a JSON file of events against the emitted schema.
 
     Accepts a single event object or an array of them. An array is additionally
@@ -51,16 +57,32 @@ def validate(path: Path) -> None:
     payloads = data if isinstance(data, list) else [data]
 
     failures = [i for i, payload in enumerate(payloads) if not accepts(payload)]
+    monotonic_ok: bool | None = None
     for i in failures:
         click.echo(f"event {i}: rejected by the emitted schema", err=True)
 
     if not failures and isinstance(data, list):
         events = [Event.model_validate(payload) for payload in payloads]
-        if not is_monotonic(events):
+        monotonic_ok = is_monotonic(events)
+        if not monotonic_ok:
             click.echo("sequence: seq is not monotonic", err=True)
-            sys.exit(1)
 
-    if failures:
+    exit_code = 1 if (failures or monotonic_ok is False) else 0
+
+    if report is not None:
+        doc = {
+            "path": str(path),
+            "events": len(payloads),
+            "schema_failures": failures,
+            "monotonic_checked": isinstance(data, list),
+            "monotonic_ok": monotonic_ok,
+            "ok": exit_code == 0,
+        }
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text(json.dumps(doc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        click.echo(f"wrote report {report}")
+
+    if exit_code != 0:
         sys.exit(1)
     click.echo(f"{len(payloads)} event(s) valid")
 
