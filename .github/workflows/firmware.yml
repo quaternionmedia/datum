@@ -1,0 +1,62 @@
+name: Firmware
+
+# Builds the ESPHome configuration. `docs/firmware.md` checks that the topics
+# and payloads in that YAML match the Python constants, but it does not run
+# ESPHome, so it cannot tell you the configuration compiles. This job is the
+# other half: a lambda that does not compile, a component that does not exist
+# for this chip, or a pin the platform rejects fails the branch here.
+#
+# The toolchain is deliberately unpinned. ESP32-C6 component coverage in
+# ESPHome is younger than the classic ESP32's, so an upstream break is a
+# finding worth surfacing on a pull request rather than at a flash -- see the
+# WP-3 note in HANDOFF.md. Pin it here if that becomes noise rather than signal.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - t1-core.yaml
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install ESPHome
+        run: pip install esphome
+
+      # The ESP-IDF toolchain is a large download and does not change between
+      # runs. Keyed on the config so a second board gets its own entry.
+      - name: Cache the toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            ~/.espressif
+            firmware/.esphome
+          key: esphome-${{ runner.os }}-${{ matrix.config }}-${{ hashFiles('firmware/*.yaml') }}
+          restore-keys: |
+            esphome-${{ runner.os }}-${{ matrix.config }}-
+            esphome-${{ runner.os }}-
+
+      # Split from the compile so a schema error reads as one in the log,
+      # rather than as a build that died somewhere in a toolchain.
+      - name: Validate the configuration
+        run: esphome config firmware/${{ matrix.config }}
+
+      - name: Compile
+        run: esphome compile firmware/${{ matrix.config }}
