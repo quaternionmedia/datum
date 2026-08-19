@@ -128,3 +128,59 @@ Record high-discipline decisions with context and consequences.
   change. That is the intended signal, up to the point it becomes noise.
 - Follow-up: Pin it if it goes red for reasons unrelated to this repository.
 - Governance impact: none
+
+- Date: 2026-08-18
+- Scope: Datum
+- Decision: Write the firmware in block-style YAML, never flow style.
+- Why now: `${...}` contains a brace and a brace is a flow indicator, so an
+  ESPHome substitution cannot appear unquoted inside a flow mapping. The whole
+  file was written in flow style and none of it parsed. This is not a style
+  preference; flow style and substitutions are incompatible.
+- Evidence: `esphome config` failed with a YAML syntax error at the first
+  `packages:` include, then reported the configuration valid after the rewrite.
+- Consequences: Contact channels and script calls read as blocks. The gesture
+  reader in datum.firmware matches on `action:` alone rather than on a line
+  that also carries `script.execute:`.
+- Follow-up: None. The CI job now catches this class before review does.
+- Governance impact: none
+
+- Date: 2026-08-18
+- Scope: Datum
+- Decision: The event payload's `ch` uses `%d`, not `%u`.
+- Why now: Generated code passes the script parameter as a C++ `int`. Feeding
+  a signed int to `%u` is a format mismatch the compiler may warn on, and the
+  values are 0..3 so nothing is gained by the unsigned specifier.
+- Evidence: `firmware/.esphome/build/.../main.cpp` shows
+  `StatelessLambdaAction<int, std::string>` and `set_args` returning `int`.
+  The byte-identity check in docs/firmware.md still passes.
+- Consequences: None on the wire. The bytes are unchanged.
+- Follow-up: None.
+- Governance impact: none
+
+- Date: 2026-08-18
+- Scope: Integration
+- Decision: The enclosure lands in apothecary as `datum-core`, parameterised
+  against a generic 40 x 40 mm board rather than against this project's PCB.
+- Why now: The user asked for a parts iteration view with datum loaded. The
+  geometry non-negotiable puts all of it in apothecary and requires a part to
+  render coherently from its defaults knowing nothing about the PCB.
+- Evidence: `apothecary parts info datum-core` reports 45.6 x 45.6 x 15.6 mm;
+  STL generation exits 0; the part appears in the `parts_library` site tree.
+- Consequences: This is WP-5 work arriving before WP-4, so every dimension is
+  an assumption. The part README says which ones must be checked against a
+  schematic before anyone prints it.
+- Follow-up: Re-fit against the real board outline when WP-4 produces one.
+- Governance impact: review needed -- WP order is fixed and this is out of it.
+
+- Date: 2026-08-18
+- Scope: Apothecary
+- Decision: `apothecary parts info` reports the part's bounding box.
+- Why now: Datum's milestone assertion 5 is "`apothecary parts info datum-core`
+  returns the part with non-null bounds", and the command reported no bounds at
+  all, so the assertion was not satisfiable as written.
+- Evidence: `--json-out` now carries a `bounds` object; a regression test pins
+  the datum-core envelope.
+- Consequences: Parts that set neither `get_bounds` nor `default_bounds` report
+  null, which is honest rather than a guess.
+- Follow-up: Wire the assertion into datum CI at WP-5/WP-6.
+- Governance impact: none

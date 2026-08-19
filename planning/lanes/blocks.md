@@ -10,8 +10,13 @@ Use this file for blockers that can prevent HIL completion or release readiness.
       devkit, which is not a BOM item.
 - [ ] No ESP32-C6-DevKitC-1 on hand. This is the only thing between the
       firmware configuration and closing milestone assertion 2.
-- [ ] Firmware compile is unverified locally; ESPHome is not installed and the
-      CI job has not yet run on a pull request.
+- [ ] Firmware compile is unverified. `esphome config` passes locally, but
+      `esphome compile` fails on this Windows machine installing the ESP-IDF
+      5.5.5 framework -- an environment failure, reached after codegen and
+      before the compiler. CI on Linux is what settles it.
+- [ ] datum-core enclosure dimensions are assumptions. No schematic exists to
+      check the footprint, connector height, indicator position or the tallest
+      component that sets headroom.
 
 ## Risk template
 

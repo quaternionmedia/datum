@@ -23,8 +23,12 @@ clause 2).
 **WP-0, WP-1 and WP-2 are complete. WP-3 is under way and is not done.**
 `main` is pushed and is the published state; work reaches it as pull requests.
 
-WP-3's configuration exists, CI compiles it, and `docs/firmware.md` checks its
-topics and payloads against the constants. **Nothing has been flashed.** WP-3
+WP-3's configuration exists and `esphome config` reports it valid on ESPHome
+2026.7.4; `docs/firmware.md` checks its topics and payloads against the
+constants. The compile itself has not been proven anywhere yet — `esphome
+compile` reaches codegen and then fails installing the ESP-IDF framework on
+Windows, so `firmware.yml` on Linux is what settles it. **Nothing has been
+flashed.** WP-3
 closes when a real device produces a real capture, and until it does, assertion
 2 stays qualified exactly as it was — see below. Do not read a green firmware
 build as a working button.
