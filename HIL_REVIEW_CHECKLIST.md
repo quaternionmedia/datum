@@ -7,16 +7,16 @@ skipped assertion as a pass, and this file follows the same rule.
 ## Run this first
 
 ```bash
-uv run python demo/hil.py
+uv run datum hil
 ```
 
 One command, no servers, nothing left running. It proves everything provable
 without hardware and prints the remaining IRL cases. See
-[`demo/README.md`](demo/README.md).
+[`docs/hil.md`](docs/hil.md).
 
 ## Proven, locally and repeatably
 
-- [x] `uv run pytest` — 20 collected, 19 passed, 1 skipped
+- [x] `uv run pytest` — 25 collected, 24 passed, 1 skipped
 - [x] The skip is `docs/wire.md`, which needs a broker and says so
 - [x] Ten checked-in vectors: six accepted, four rejected, each leaving a report
 - [x] A v1-pinned consumer parses a capability-extended event and yields an
@@ -104,7 +104,7 @@ wiring: [`firmware/README.md`](firmware/README.md).
 
 ## Suggested review order
 
-1. Run `demo/hil.py` and read the table
+1. Run `uv run datum hil` and read the table
 2. Push, so CI compiles the firmware for the first time
 3. BOM and design assumptions
 4. Schematic, ERC/DRC

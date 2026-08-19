@@ -17,7 +17,7 @@ This matrix is for first-device hardware-in-the-loop validation once BOM-backed 
 
 ## Before any of this
 
-Run `uv run python demo/hil.py`. Everything provable without hardware is proven
+Run `uv run datum hil`. Everything provable without hardware is proven
 there, and the cases below are what it reports as still open. Starting here
 means a failure at the bench is a hardware or firmware finding rather than
 something that was already broken on the desk.

@@ -38,8 +38,8 @@ uv run pytest
 | [`docs/wire.md`](docs/wire.md) | The same contract over a real MQTT broker |
 | [`docs/firmware.md`](docs/firmware.md) | The seam between the ESPHome YAML and these constants |
 | [`docs/conformance.md`](docs/conformance.md) | The ten checked-in vectors and the two gates they take |
-| [`docs/cli.md`](docs/cli.md) | `datum version`, `validate`, `emit` |
-| [`demo/README.md`](demo/README.md) | One command that proves everything provable without hardware, and names what is left |
+| [`docs/cli.md`](docs/cli.md) | `datum version`, `validate`, `emit`, `hil` |
+| [`docs/hil.md`](docs/hil.md) | One command that proves everything provable without hardware, and names what is left |
 | [`schema/projections/README.md`](schema/projections/README.md) | Which axes each transport carries, and which it drops |
 
 ## Not here yet

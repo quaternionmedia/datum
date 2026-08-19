@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -97,6 +98,67 @@ def validate(path: Path, report: Path | None) -> None:
     if exit_code != 0:
         sys.exit(1)
     click.echo(f"{len(payloads)} event(s) valid")
+
+
+@cli.command()
+@click.option(
+    "--broker",
+    default=None,
+    metavar="HOST:PORT",
+    help="An MQTT broker for the wire contract. Overrides DATUM_BROKER.",
+)
+def hil(broker: str | None) -> None:
+    """Prove what is provable without hardware, and name what is left.
+
+    The entry point for a hardware-in-the-loop review. Runs the contract end
+    to end against whatever is installed, writes report artifacts, and lists
+    the IRL cases only a board on a bench can close. Starts nothing, and
+    leaves nothing running.
+
+    This is not the test suite -- ``uv run pytest`` is. See ``docs/hil.md``.
+    """
+    from datum.hil import MARK, NEEDS_HARDWARE, find_repo_root, parse_broker, run_all
+
+    root = find_repo_root()
+    if root is None:
+        raise click.ClickException(
+            "run this from a datum checkout: it needs schema/vectors, docs/ and firmware/"
+        )
+
+    steps = run_all(root, parse_broker(broker or os.environ.get("DATUM_BROKER")))
+
+    click.echo("Datum -- pre-HIL proof run")
+    click.echo(f"repository: {root}")
+    click.echo("")
+
+    width = max(len(s.name) for s in steps)
+    for s in steps:
+        click.echo(f"  [{MARK[s.state]}] {s.name.ljust(width)}  {s.detail}")
+
+    failed = [s for s in steps if s.state == "fail"]
+    skipped = [s for s in steps if s.state == "skip"]
+    passed = [s for s in steps if s.state == "pass"]
+
+    click.echo("")
+    click.echo(f"{len(passed)} proved, {len(failed)} failed, {len(skipped)} skipped")
+    click.echo(f"reports: {(root / 'schema' / 'build' / 'reports')}")
+
+    click.echo("")
+    click.echo("Still needs a board on a bench. Nothing above can close these:")
+    for case, description in NEEDS_HARDWARE:
+        click.echo(f"  {case}  {description}")
+    click.echo("")
+    click.echo("  planning/IRL_TEST_MATRIX.md carries the stimulus and expected result")
+    click.echo("  for each. firmware/README.md has the GPIO map and the jig wiring.")
+
+    if skipped:
+        click.echo("")
+        click.echo("Skipped, and why:")
+        for s in skipped:
+            click.echo(f"  {s.name}: {s.detail}")
+
+    if failed:
+        sys.exit(1)
 
 
 @cli.command()

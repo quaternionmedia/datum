@@ -184,3 +184,33 @@ Record high-discipline decisions with context and consequences.
   null, which is honest rather than a guess.
 - Follow-up: Wire the assertion into datum CI at WP-5/WP-6.
 - Governance impact: none
+
+- Date: 2026-08-19
+- Scope: Datum
+- Decision: The pre-HIL runner is a Click subcommand, `datum hil`, not a script
+  under a new top-level `demo/`.
+- Why now: The first draft was `demo/hil.py` built on argparse. The house-stack
+  record blesses Click for CLIs and requires an org-level record for anything
+  outside the set, so argparse was an out-of-set choice for a job the blessed
+  set already covers. A new top-level directory also sits outside the work
+  package path table in `AGENTS.md`.
+- Evidence: `uv run datum hil` -> 6 proved, 0 failed, 1 skipped. `datum --help`
+  lists it. `docs/hil.md` is the reference and carries its own doctests.
+- Consequences: One surface rather than two. The runner ships with the package,
+  so it degrades honestly outside a checkout rather than crashing — it looks
+  for `pyproject.toml` and `schema/vectors` and says what it needs.
+- Follow-up: None. The `demo/` directory is gone.
+- Governance impact: none — this removes a deviation rather than adding one.
+
+- Date: 2026-08-19
+- Scope: Integration
+- Decision: The list of hardware-only IRL cases lives beside the runner, and
+  the documentation checks it against the test matrix.
+- Why now: A case added to the matrix and not to the runner, or the reverse, is
+  a case nobody runs. That is the same drift the firmware seam gate exists to
+  catch, applied to the review checklist instead of the wire.
+- Evidence: `docs/hil.md` compares `irl_case_ids()` to every `IRL-NNN` found in
+  `planning/IRL_TEST_MATRIX.md`, and it runs under `uv run pytest`.
+- Consequences: The seven cases cannot silently disagree.
+- Follow-up: None.
+- Governance impact: none

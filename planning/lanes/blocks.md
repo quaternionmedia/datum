@@ -18,6 +18,44 @@ Use this file for blockers that can prevent HIL completion or release readiness.
       check the footprint, connector height, indicator position or the tallest
       component that sets headroom.
 
+## Governance findings, 2026-08-19
+
+Raised by reading the corpus rather than `AGENTS.md`'s summary of it. All three
+are for a human; none is a project-level call, and two are org-level by
+construction — a project may tighten an org record, never relax or amend one.
+
+- [ ] **The `governance/qm` submodule was never initialised in this clone.**
+      `git submodule status` showed `-9f92119`, so `governance/qm` was an empty
+      directory and the entire corpus — `PRINCIPLES.md`, the ten org records,
+      the nine project drafts — was unreadable. Every governance claim made in
+      this repository's sessions up to now came from `AGENTS.md`'s summary of
+      documents nobody could open. `AGENTS.md`'s "One-time setup on a fresh
+      clone" covers the Windows symlink case and says nothing about
+      `git submodule update --init`. The same omission is in `project-seed/`,
+      so fixing only this copy would hide an org-level defect in nine adopting
+      projects. Next action: raise at org level; do not patch locally.
+
+- [ ] **`governance/qm/handbook/style-guide.md` does not exist.** `AGENTS.md`
+      cites it twice and `HANDOFF.md` once, as the authority for README being
+      an onramp, for `docs/` carrying the executable reference, and for where
+      explanation goes. The org `README.md` says plainly: "Style guide
+      (minimal, legible deliverables) is named by the charter and not yet
+      written." The practice is sound and this project follows it; the citation
+      is to a document that has never existed. Next action: either write the
+      page at org level or drop the citations.
+
+- [ ] **The house-stack record names PDM. This project stands on uv.**
+      `AGENTS.md` says "The stack is fixed by
+      `governance/qm/records/DRAFT-house-stack.md`: Python, Pydantic, Click,
+      pytest, uv." The record's blessed set reads "pytest (tests), PDM
+      (packaging, with a committed lockfile)" and its context paragraph
+      anticipates exactly this: "a project standing on uv would be the same
+      trigger firing in the other direction, and would be answered the same
+      way." So uv is not blessed, it is a named revision trigger, and clause 2
+      says an out-of-set choice without a linked record fails review. Both
+      datum and apothecary stand on uv. Next action: an org-level record
+      answering the trigger, the way PDM's own adoption was answered.
+
 ## Risk template
 
 - Risk:
