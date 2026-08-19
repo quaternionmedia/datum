@@ -36,14 +36,16 @@ uv run pytest
 | [`docs/envelope.md`](docs/envelope.md) | The payload: required fields, optional axes, and where the compatibility guarantee lives |
 | [`docs/topic-contract.md`](docs/topic-contract.md) | Topics, what each carries, and which are retained |
 | [`docs/wire.md`](docs/wire.md) | The same contract over a real MQTT broker |
+| [`docs/firmware.md`](docs/firmware.md) | The seam between the ESPHome YAML and these constants |
 | [`docs/conformance.md`](docs/conformance.md) | The ten checked-in vectors and the two gates they take |
 | [`docs/cli.md`](docs/cli.md) | `datum version`, `validate`, `emit` |
 | [`schema/projections/README.md`](schema/projections/README.md) | Which axes each transport carries, and which it drops |
 
 ## Not here yet
 
-- **Firmware and hardware.** No ESPHome configuration, no KiCad project. The
-  cookbook models a T1-Core; it does not flash one.
+- **Hardware.** No KiCad project. `firmware/` holds an ESPHome configuration
+  that CI compiles, but nothing here has been flashed to a board, so milestone
+  assertion 2 still rides on a captured stand-in.
 - **The license gate.** REUSE is wired; the dependency-manifest gate is not.
 - **Enclosure.** All printable geometry lives in `quaternionmedia/apothecary`.
   No `.scad` files land here.
