@@ -73,6 +73,17 @@ it is the part that goes stale.
 
 ## Setup and test commands
 
+The governance corpus is a submodule at `governance/qm`, and a plain clone
+leaves it empty. `git clone --recurse-submodules`, or after the fact:
+
+```bash
+git submodule update --init                # governance/qm, or it is an empty directory
+```
+
+Without it every record this file cites is unreadable, `adr-lint` and
+`submodule-check` fail for a reason that has nothing to do with your change,
+and an agent reads this file's *summary* of the corpus instead of the corpus.
+
 ```bash
 uv sync                                    # install
 uv run pytest                              # run the documentation

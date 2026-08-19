@@ -20,41 +20,48 @@ Use this file for blockers that can prevent HIL completion or release readiness.
 
 ## Governance findings, 2026-08-19
 
-Raised by reading the corpus rather than `AGENTS.md`'s summary of it. All three
-are for a human; none is a project-level call, and two are org-level by
-construction — a project may tighten an org record, never relax or amend one.
+Raised by reading the corpus rather than `AGENTS.md`'s summary of it. Two are
+closed; the rest are for a human.
 
-- [ ] **The `governance/qm` submodule was never initialised in this clone.**
-      `git submodule status` showed `-9f92119`, so `governance/qm` was an empty
-      directory and the entire corpus — `PRINCIPLES.md`, the ten org records,
-      the nine project drafts — was unreadable. Every governance claim made in
-      this repository's sessions up to now came from `AGENTS.md`'s summary of
-      documents nobody could open. `AGENTS.md`'s "One-time setup on a fresh
-      clone" covers the Windows symlink case and says nothing about
-      `git submodule update --init`. The same omission is in `project-seed/`,
-      so fixing only this copy would hide an org-level defect in nine adopting
-      projects. Next action: raise at org level; do not patch locally.
+- [x] **The `governance/qm` submodule was never initialised in this clone.**
+      `governance/qm` was an empty directory, so the entire corpus was
+      unreadable and every governance claim made here came from `AGENTS.md`'s
+      summary of documents nobody could open. Fixed, and the setup step is now
+      in `AGENTS.md`. This was not an org-seed defect: `carlos` and `loopwall`
+      already carry the line in their own project-specific sections and are the
+      local checkouts where the submodule is populated. `apothecary` and
+      `dossier` have the same gap; apothecary's is fixed.
 
-- [ ] **`governance/qm/handbook/style-guide.md` does not exist.** `AGENTS.md`
-      cites it twice and `HANDOFF.md` once, as the authority for README being
-      an onramp, for `docs/` carrying the executable reference, and for where
-      explanation goes. The org `README.md` says plainly: "Style guide
-      (minimal, legible deliverables) is named by the charter and not yet
-      written." The practice is sound and this project follows it; the citation
-      is to a document that has never existed. Next action: either write the
-      page at org level or drop the citations.
+- [x] **`governance/qm/handbook/style-guide.md` does not exist.** It does. The
+      pin was 261 files and 49k lines behind `project/datum`, and the style
+      guide landed in that window. The citations in `AGENTS.md` and `HANDOFF.md`
+      are sound against the current corpus. Pin bumped.
 
-- [ ] **The house-stack record names PDM. This project stands on uv.**
-      `AGENTS.md` says "The stack is fixed by
-      `governance/qm/records/DRAFT-house-stack.md`: Python, Pydantic, Click,
-      pytest, uv." The record's blessed set reads "pytest (tests), PDM
-      (packaging, with a committed lockfile)" and its context paragraph
-      anticipates exactly this: "a project standing on uv would be the same
-      trigger firing in the other direction, and would be answered the same
-      way." So uv is not blessed, it is a named revision trigger, and clause 2
-      says an out-of-set choice without a linked record fails review. Both
-      datum and apothecary stand on uv. Next action: an org-level record
-      answering the trigger, the way PDM's own adoption was answered.
+- [ ] **The house-stack record names PDM; this project stands on uv.** Still
+      true at the branch tip. It is a draft — `DRAFT-house-stack.md`, Status
+      Proposed — and the corpus now ships a `uv.lock` of its own, so the record
+      is behind its own practice. It should be updated at org level; the
+      record's context paragraph already anticipates exactly this case and says
+      how to answer it. Nothing here is blocked on it.
+
+- [ ] **`DRAFT-one-executable-walkthrough.md` now governs this repository and
+      it is not complied with.** It arrived in the propagation this pin bump
+      picked up. Clause 1: every QM repository carries exactly one
+      `walkthrough/` at its root, pages `NN-<slug>.md`, and it is the single
+      path for development, onboarding and communication. This project's
+      executable pages are in `docs/`. Clause 2 also requires the test command
+      to name the directory explicitly rather than rely on `testpaths`, which
+      is precisely how `pyproject.toml` wires it today — the record measured
+      that `testpaths` is ignored the moment pytest receives a path argument,
+      so pages wired that way are collected by nobody and stay green forever.
+      The record cites this project by name as the existence proof that the
+      mechanism costs configuration rather than a toolchain. Next action:
+      migrate `docs/` to `walkthrough/` and name it in the CI invocation.
+
+- [ ] **The pin was stale enough to change conclusions, and nothing reported
+      it.** `submodule-check` is one of the three seed CI workflows and it did
+      not catch a corpus 261 files behind. Whatever it checks, it is not
+      freshness. Worth raising alongside the walkthrough migration.
 
 ## Risk template
 

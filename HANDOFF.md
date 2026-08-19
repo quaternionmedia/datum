@@ -104,8 +104,10 @@ four would be a fabricated test.
 
 Verified against a real fresh clone, not asserted: `CLAUDE.md` and
 `.github/copilot-instructions.md` resolve to `AGENTS.md` in full; the ADR lint
-is clean over all nine drafts; `git submodule update --remote` lands on the
-branch tip with no drift.
+is clean over all nine drafts. `git submodule update --remote` no longer
+lands with no drift: the pin sat 261 files behind `project/datum` until it
+was bumped on 2026-08-19, and a plain clone leaves the submodule empty
+altogether — `AGENTS.md` now says so under setup.
 
 **Before your first commit,** read `AGENTS.md`. Two rules there will catch you
 out. Human-only contributorship: no `Co-Authored-By:` trailer naming a vendor
