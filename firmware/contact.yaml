@@ -1,0 +1,63 @@
+# One dry contact, included once per channel from `t1-core.yaml`.
+#
+# The contact shorts the pin to ground, so the pin is pulled up and read
+# inverted: closed reads ON.
+#
+# Gesture branches are ordered longest first. ESPHome takes the first timing
+# that matches, so listing `single` above `triple` would swallow the other two.
+
+binary_sensor:
+  - platform: gpio
+    id: contact_${ch}
+    name: Contact ${ch}
+    pin:
+      number: ${pin}
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    filters:
+      - delayed_on_off: ${debounce}
+
+    on_multi_click:
+      - timing:
+          - ON for at most ${gap}
+          - OFF for at most ${gap}
+          - ON for at most ${gap}
+          - OFF for at most ${gap}
+          - ON for at most ${gap}
+          - OFF for at least ${gap}
+        then:
+          - script.execute: { id: emit, ch: ${ch}, action: triple }
+
+      - timing:
+          - ON for at most ${gap}
+          - OFF for at most ${gap}
+          - ON for at most ${gap}
+          - OFF for at least ${gap}
+        then:
+          - script.execute: { id: emit, ch: ${ch}, action: double }
+
+      - timing:
+          - ON for at most ${gap}
+          - OFF for at least ${gap}
+        then:
+          - script.execute: { id: emit, ch: ${ch}, action: single }
+
+      # Fires while the contact is still closed, which is what makes the
+      # release below the second half of a pair rather than a duplicate.
+      - timing:
+          - ON for at least ${hold}
+        then:
+          - lambda: 'id(held)[${ch}] = true;'
+          - script.execute: { id: emit, ch: ${ch}, action: hold }
+
+    # Only after a hold. Every gesture ends in a release, and emitting one
+    # each time would double the event count for a single press.
+    on_release:
+      - if:
+          condition:
+            lambda: 'return id(held)[${ch}];'
+          then:
+            - lambda: 'id(held)[${ch}] = false;'
+            - script.execute: { id: emit, ch: ${ch}, action: release }
