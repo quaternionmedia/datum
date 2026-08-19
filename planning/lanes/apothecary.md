@@ -16,6 +16,8 @@ Drive enclosure and fit functionality as a first-class iteration partner to Datu
 - [x] Identify minimum parameter contract needed from Datum board assumptions.
 - [x] Propose one iteration that can be validated before full hardware availability.
 - [ ] Check the datum-core dimensions against a real schematic when WP-4 exists.
+- [x] Build the tooling to iterate the enclosure without editing source between
+      attempts: `-p name=value` overrides and a declared-vs-measured bounds gate.
 - [x] Add OpenSCAD readiness output to `apothecary check` for faster local diagnosis.
 
 ## Imported upstream backlog (apothecary)
@@ -54,3 +56,37 @@ Drive enclosure and fit functionality as a first-class iteration partner to Datu
 
 - Functional enclosure requirements are explicit and testable.
 - Cross-repo dependency on board assumptions is documented.
+
+## Iteration tooling (2026-08-19)
+
+The loop is now `generate-stl -p` then `verify -p`, with the viewer reloading.
+`docs/iterating-a-part.md` in apothecary carries the reference.
+
+- Parameter overrides reach OpenSCAD as `-D`, on the CLI and over HTTP, and are
+  validated against the part's own model first. OpenSCAD accepts any `-D` name
+  whether the file defines it or not, so an unvalidated typo renders the
+  defaults and exits 0 -- which reads as a successful render of the wrong thing.
+- Each render records its inputs in a sidecar, because a variant lands at the
+  canonical STL path and is otherwise indistinguishable from a default.
+- `apothecary parts verify` measures the rendered bounding box against the
+  wrapper's declared bounds and exits non-zero on drift.
+
+### What the gate found
+
+Four of the six parts declaring bounds are wrong. Only `calibration_cube` and
+`datum-core` agree with their geometry.
+
+| Part | Declared | Measured |
+|---|---|---|
+| V-Slot | 20 x 20 x 100 | 20 x 20 x 20 |
+| couch_block | 40 x 40 x 20 | 152.4 x 101.6 x 50.8 |
+| dryerknob | 30 x 30 x 15 | 33 x 33 x 20 |
+| parametric_star | 40 x 40 x 2 | 27.14 x 28.53 x 3 |
+
+Recorded in apothecary's `todo.md`, not fixed: which side is authoritative
+belongs to whoever owns each part.
+
+It also caught one of ours. `datum-core`'s exploded preview declared 32.6 mm and
+measured 29.6 -- the lid's lip hung into the gap, so `explode_gap` was not the
+separation it claimed. Fixed in the geometry rather than in the number.
+
