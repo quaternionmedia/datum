@@ -132,3 +132,21 @@ def emitted_actions() -> set[str]:
         for line in text.splitlines()
         if line.strip().startswith("action:")
     }
+
+
+def declared_topics() -> list[str]:
+    """Every ``topic:`` the configuration declares, in file order.
+
+    The birth and the will both name the availability topic, so a check that
+    only asks whether that string *appears* passes while one of the two has
+    drifted. This returns each of them, so they can be checked one by one.
+
+    >>> len(declared_topics())
+    2
+    """
+    return [
+        line.split("topic:", 1)[1].strip()
+        for line in config_text().splitlines()
+        if line.strip().startswith("topic:")
+    ]
+

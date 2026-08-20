@@ -31,6 +31,16 @@ the suffix has to be the one the contract generates:
     >>> status_topic("${src}") in config
     True
 
+The availability topic is declared twice — once as the birth message, once as
+the last will — so asking whether it *appears* passes even when one of the two
+has drifted. Each is checked:
+
+    >>> from datum.firmware import declared_topics
+    >>> declared_topics()
+    ['${src}/status', '${src}/status']
+    >>> all(topic == status_topic("${src}") for topic in declared_topics())
+    True
+
 Rename a suffix in `datum.topics` and this page fails until the firmware is
 renamed with it. That is the entire point of the check: the two cannot drift
 without the build going red.

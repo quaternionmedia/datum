@@ -24,7 +24,7 @@ Datum -- pre-HIL proof run
   [SKIP] Wire contract            DATUM_BROKER not set
   [PASS] Firmware configuration   configuration is valid
   [PASS] Firmware seam            YAML and constants agree
-  [PASS] Enclosure bounds         declared bounds match the geometry, at the pinned 3039851
+  [PASS] Enclosure bounds         declared bounds match the geometry, at the pinned <commit>
 
 6 proved, 0 failed, 1 skipped
 ```
@@ -89,7 +89,16 @@ checks it in CI:
 
 Working against a newer apothecary is allowed. Reporting the run as proving the
 pin when it proved something else is not, and neither is claiming the pin when
-the commit could not be read.
+the commit could not be read, nor when the tree it read has uncommitted changes.
+
+The sample above says `<commit>` rather than a hash. A pin written into prose
+is a second copy of the constant, and this page had to be hand-corrected three
+times in one session before that was obvious. What the run prints is checked
+here instead:
+
+    >>> from datum.hil import APOTHECARY_PIN, pin_state
+    >>> pin_state(APOTHECARY_PIN) == f"at the pinned {APOTHECARY_PIN}"
+    True
 
 ## The cases only hardware can close
 
