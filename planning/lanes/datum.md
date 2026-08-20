@@ -71,6 +71,18 @@ Advance schema-to-firmware-to-HIL readiness with verifiable local checkpoints.
   `walkthrough/08-wire.md` ran rather than skipping.
 - `uv run datum hil` -> 6 proved, 0 failed, 1 skipped.
 
+## Evidence, 2026-08-20 (review rounds)
+
+- Six blind-review rounds: 2 → 2 → 1 → 2 → 0 → 0 defects. Mutation testing
+  caught ten of eleven deliberate breakages; the miss was a real hole in the
+  firmware seam, which tested whether a topic appeared rather than each
+  declaration of it. Closed.
+- `pin_state` no longer claims the pin for an unreadable commit or for a
+  working tree with uncommitted changes. Both were observed, not theorised.
+- Hand-written test counts removed from the checklist, this lane and the
+  handoff; one was stale within the hour of being written.
+- `README.md` carries the enclosure loop, which was documented nowhere.
+
 ## Done criteria for this lane
 
 - A BOM-backed HIL test matrix exists.

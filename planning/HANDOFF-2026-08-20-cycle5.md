@@ -17,6 +17,18 @@ uv run datum hil                     # one command, no servers, nothing left run
 That prints what is proven and what still needs a bench. Then read
 `walkthrough/` in order — the pages are the test suite.
 
+To see or change the enclosure, the apothecary checkout needs its JavaScript
+dependencies once; the viewer serves three.js from itself rather than a CDN and
+renders nothing without them:
+
+```bash
+cd ../apothecary && uv run apothecary install
+uv run apothecary serve --port 8765     # /viewer is the only entry point
+```
+
+`README.md`'s **The enclosure** section is the short form of that loop;
+`apothecary/walkthrough/` is the reference and is executable.
+
 ## The two pull requests
 
 | | Branch | PR |
@@ -48,7 +60,25 @@ depends on against that pin.
 
 **Everything the firmware claims is gated.** `walkthrough/04-firmware.md` reads
 the topics and payload templates back out of the YAML and compares them to the
-Python constants, byte for byte.
+Python constants, byte for byte — each declaration of each topic, not merely
+whether the string appears somewhere.
+
+**Six blind-review rounds ran, and stopped finding things.** They went
+2 → 2 → 1 → 2 → 0 → 0 defects, and the character changed as they went: code
+first, then documentation drift, then the review's own tooling. What they
+found, in case it recurs:
+
+- Six sliders in apothecary offered values the model rejects — `gt=0` reaches
+  JSON Schema as an *exclusive* minimum and was read as inclusive.
+- `datum hil` claimed the pin for a working tree with uncommitted changes.
+- The firmware seam tested whether a topic *appeared*; the availability topic
+  is declared twice, so one could drift and the gate stayed green.
+- A pinned commit written into prose, hand-corrected three times before anyone
+  noticed it was a second copy of the constant.
+- Test counts stated as current facts, one of them stale within the hour.
+
+Mutation testing is what earned its keep: eleven deliberate breakages, ten
+caught, and the miss was the real hole in the firmware seam.
 
 ## What to distrust
 
@@ -70,6 +100,11 @@ one had asserted rather than checked.
 - **`uv run pytest` is not what CI runs** in apothecary. CI runs
   `apothecary test all`, which includes the Playwright E2E phase. Running with
   `--ignore=tests/e2e` hides ten viewer tests.
+- **A configured gate is not a running one.** apothecary's
+  `.pre-commit-config.yaml` sets up black, ruff and whitespace hooks that no
+  workflow runs, and `parts verify --all` is wired into nothing. Both are in
+  that repo's `todo.md` with the evidence. Check what a gate *runs*, not what
+  it declares.
 
 ## Decisions waiting on a human
 
@@ -114,6 +149,11 @@ made by seeing what it costs: 0.6 mm of wall is 1.2 mm of envelope.
    and the T0 jig wiring. `planning/IRL_TEST_MATRIX.md` has the seven cases.
 5. **WP-4**, which unblocks re-fitting the enclosure against a real outline.
 6. **WP-6's dependency-manifest licence gate**, still a carried gap.
+7. **Two unwired gates in apothecary**, items 7 and 8 of its `todo.md`:
+   pre-commit runs nowhere (46 ruff violations prove it), and
+   `parts verify --all` gates nothing while five parts report an envelope their
+   geometry does not have. Wiring either fails the build until the underlying
+   work is done, which is why they are recorded rather than switched on.
 
 ## Governance
 

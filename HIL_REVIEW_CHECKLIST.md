@@ -29,6 +29,11 @@ without hardware and prints the remaining IRL cases. See
 - [x] `apothecary parts verify datum-core` — declared bounds match geometry
 - [x] `reuse lint` clean
 - [x] Governance brief reviewed: `AGENTS.md`, `HANDOFF.md`, `PLAN.md`
+- [x] The firmware compiles: `Firmware` green in CI on the pull request
+- [x] The enclosure is verified by machine against a pinned apothecary:
+      `Enclosure` green in CI
+- [x] Six blind-review rounds run to no findings; mutation testing caught ten
+      of eleven deliberate breakages and the miss is closed
 
 ## Proven only on paper
 
