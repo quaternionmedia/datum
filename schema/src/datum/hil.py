@@ -33,7 +33,7 @@ DEFAULT_MQTT_PORT = 1883
 # Bumping the pin is a reviewed commit here, the same way the governance
 # submodule's pin is.
 APOTHECARY_REPO = "https://github.com/quaternionmedia/apothecary"
-APOTHECARY_PIN = "627ac80"
+APOTHECARY_PIN = "9f86f3a"
 APOTHECARY_PARTS = ("datum-core",)
 
 # The cases nothing on a desk can close. Kept beside the runner so the list a
