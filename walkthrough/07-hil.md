@@ -24,7 +24,7 @@ Datum -- pre-HIL proof run
   [SKIP] Wire contract            DATUM_BROKER not set
   [PASS] Firmware configuration   configuration is valid
   [PASS] Firmware seam            YAML and constants agree
-  [PASS] Enclosure bounds         declared bounds match the geometry
+  [PASS] Enclosure bounds         declared bounds match the geometry, at the pinned 14878d0
 
 6 proved, 0 failed, 1 skipped
 ```
@@ -44,7 +44,7 @@ prevent, and `walkthrough/08-wire.md` already says so about itself.
 | **Wire contract** | Topics, encoding, retention and a late subscriber, over a real broker |
 | **Firmware configuration** | `esphome config` resolves every wire-critical string in the YAML |
 | **Firmware seam** | The topics and payload templates read back out of the YAML and compared to the constants |
-| **Enclosure bounds** | `datum-core`'s declared envelope measured against the geometry OpenSCAD emits |
+| **Enclosure bounds** | `datum-core`'s declared envelope measured against the geometry OpenSCAD emits, and which apothecary that was |
 
 ## Getting the wire contract to run
 
@@ -76,6 +76,20 @@ Each is optional, and its absence is a skip rather than a failure.
 |---|---|
 | **ESPHome** | Used if on `PATH`, otherwise fetched for the length of one command. It is the engine the firmware runs on, not a dependency of this package |
 | **OpenSCAD** | Needed for the enclosure check. The part lives in `quaternionmedia/apothecary`, expected as a sibling checkout — no printable geometry lands here |
+
+The enclosure step names the apothecary commit it actually verified. The pin is
+`APOTHECARY_PIN` in `datum.hil`, and `.github/workflows/enclosure.yml` is what
+checks it in CI:
+
+    >>> from datum.hil import pin_state
+    >>> pin_state("abc1234", pin="abc1234")
+    'at the pinned abc1234'
+    >>> pin_state("deadbee", pin="abc1234")
+    'at deadbee, not the pinned abc1234'
+
+Working against a newer apothecary is allowed. Reporting the run as proving the
+pin when it proved something else is not, and neither is claiming the pin when
+the commit could not be read.
 
 ## The cases only hardware can close
 

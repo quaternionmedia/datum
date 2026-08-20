@@ -33,7 +33,7 @@ DEFAULT_MQTT_PORT = 1883
 # Bumping the pin is a reviewed commit here, the same way the governance
 # submodule's pin is.
 APOTHECARY_REPO = "https://github.com/quaternionmedia/apothecary"
-APOTHECARY_PIN = "b24bee3"
+APOTHECARY_PIN = "14878d0"
 APOTHECARY_PARTS = ("datum-core",)
 
 # The cases nothing on a desk can close. Kept beside the runner so the list a
@@ -98,6 +98,40 @@ def find_repo_root(start: Path | None = None) -> Path | None:
         if (candidate / "pyproject.toml").is_file() and (candidate / "schema" / "vectors").is_dir():
             return candidate
     return None
+
+
+def pin_state(local: str | None, pin: str = APOTHECARY_PIN) -> str:
+    """How a checked-out apothecary relates to the pin, in one clause.
+
+    A developer is entitled to work against a newer apothecary, so drift is not
+    a failure. Reporting the run as proving the pin when it proved something
+    else would be, and so would claiming the pin when the commit could not be
+    read at all.
+
+    >>> pin_state("abc1234", pin="abc1234")
+    'at the pinned abc1234'
+
+    A longer hash from ``git rev-parse`` is the same commit:
+
+    >>> pin_state("abc1234def", pin="abc1234")
+    'at the pinned abc1234'
+
+    >>> pin_state("deadbee", pin="abc1234")
+    'at deadbee, not the pinned abc1234'
+
+    Not knowing is its own answer, and never the pin:
+
+    >>> pin_state("", pin="abc1234")
+    'at an undetermined commit, pinned abc1234'
+    >>> pin_state(None, pin="abc1234")
+    'at an undetermined commit, pinned abc1234'
+    """
+    local = (local or "").strip()
+    if not local:
+        return f"at an undetermined commit, pinned {pin}"
+    if pin.startswith(local) or local.startswith(pin):
+        return f"at the pinned {pin}"
+    return f"at {local}, not the pinned {pin}"
 
 
 def reachable(host: str, port: int, timeout: float = 2.0) -> bool:
@@ -289,11 +323,8 @@ def step_enclosure(root: Path) -> Step:
     if shutil.which("uv") is None:
         return s.skipped("uv not on PATH")
 
-    at_pin = _run(["git", "rev-parse", "--short", "HEAD"], apothecary, timeout=60)
-    local = (at_pin.stdout or "").strip()
-    drifted = bool(local) and not APOTHECARY_PIN.startswith(local) and not local.startswith(
-        APOTHECARY_PIN
-    )
+    head = _run(["git", "rev-parse", "--short", "HEAD"], apothecary, timeout=60)
+    state = pin_state(head.stdout if head.returncode == 0 else "")
 
     result = _run(
         ["uv", "run", "apothecary", "parts", "verify", "datum-core"], apothecary, timeout=600
@@ -303,14 +334,7 @@ def step_enclosure(root: Path) -> Step:
             return s.skipped("OpenSCAD not installed")
         return s.failed(tail_of(result, 4))
 
-    if drifted:
-        # Not a failure: a developer is entitled to work against a newer
-        # apothecary. But the run proved something other than the pin, and a
-        # reader should not have to guess which.
-        return s.passed(
-            f"declared bounds match the geometry, at {local}, not the pinned {APOTHECARY_PIN}"
-        )
-    return s.passed(f"declared bounds match the geometry, at the pinned {APOTHECARY_PIN}")
+    return s.passed(f"declared bounds match the geometry, {state}")
 
 
 def run_all(root: Path, broker: tuple[str, int] | None) -> list[Step]:
