@@ -100,7 +100,7 @@ def find_repo_root(start: Path | None = None) -> Path | None:
     return None
 
 
-def pin_state(local: str | None, pin: str = APOTHECARY_PIN) -> str:
+def pin_state(local: str | None, pin: str = APOTHECARY_PIN, dirty: bool = False) -> str:
     """How a checked-out apothecary relates to the pin, in one clause.
 
     A developer is entitled to work against a newer apothecary, so drift is not
@@ -125,13 +125,22 @@ def pin_state(local: str | None, pin: str = APOTHECARY_PIN) -> str:
     'at an undetermined commit, pinned abc1234'
     >>> pin_state(None, pin="abc1234")
     'at an undetermined commit, pinned abc1234'
+
+    A working tree with uncommitted changes is not the commit it names. What
+    ran was that commit plus something nobody else has:
+
+    >>> pin_state("abc1234", pin="abc1234", dirty=True)
+    'at the pinned abc1234, plus uncommitted changes'
+    >>> pin_state("deadbee", pin="abc1234", dirty=True)
+    'at deadbee, not the pinned abc1234, plus uncommitted changes'
     """
     local = (local or "").strip()
+    edited = ", plus uncommitted changes" if dirty else ""
     if not local:
         return f"at an undetermined commit, pinned {pin}"
     if pin.startswith(local) or local.startswith(pin):
-        return f"at the pinned {pin}"
-    return f"at {local}, not the pinned {pin}"
+        return f"at the pinned {pin}{edited}"
+    return f"at {local}, not the pinned {pin}{edited}"
 
 
 def reachable(host: str, port: int, timeout: float = 2.0) -> bool:
@@ -324,7 +333,11 @@ def step_enclosure(root: Path) -> Step:
         return s.skipped("uv not on PATH")
 
     head = _run(["git", "rev-parse", "--short", "HEAD"], apothecary, timeout=60)
-    state = pin_state(head.stdout if head.returncode == 0 else "")
+    edits = _run(["git", "status", "--porcelain"], apothecary, timeout=60)
+    state = pin_state(
+        head.stdout if head.returncode == 0 else "",
+        dirty=bool(edits.returncode == 0 and (edits.stdout or "").strip()),
+    )
 
     result = _run(
         ["uv", "run", "apothecary", "parts", "verify", "datum-core"], apothecary, timeout=600
