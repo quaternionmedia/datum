@@ -25,6 +25,17 @@ from pathlib import Path
 
 DEFAULT_MQTT_PORT = 1883
 
+# The enclosure lives in quaternionmedia/apothecary and nowhere else, so this
+# project depends on a specific state of it. Pinned rather than "whatever is
+# checked out next door": a sibling directory is a convenience for a developer
+# with both repositories open, and no statement at all about what CI verified.
+#
+# Bumping the pin is a reviewed commit here, the same way the governance
+# submodule's pin is.
+APOTHECARY_REPO = "https://github.com/quaternionmedia/apothecary"
+APOTHECARY_PIN = "b24bee3"
+APOTHECARY_PARTS = ("datum-core",)
+
 # The cases nothing on a desk can close. Kept beside the runner so the list a
 # reviewer is told to work through is the list the code prints; walkthrough/07-hil.md
 # checks these against planning/IRL_TEST_MATRIX.md.
@@ -278,6 +289,12 @@ def step_enclosure(root: Path) -> Step:
     if shutil.which("uv") is None:
         return s.skipped("uv not on PATH")
 
+    at_pin = _run(["git", "rev-parse", "--short", "HEAD"], apothecary, timeout=60)
+    local = (at_pin.stdout or "").strip()
+    drifted = bool(local) and not APOTHECARY_PIN.startswith(local) and not local.startswith(
+        APOTHECARY_PIN
+    )
+
     result = _run(
         ["uv", "run", "apothecary", "parts", "verify", "datum-core"], apothecary, timeout=600
     )
@@ -285,7 +302,15 @@ def step_enclosure(root: Path) -> Step:
         if "OpenSCAD not found" in (result.stdout + result.stderr):
             return s.skipped("OpenSCAD not installed")
         return s.failed(tail_of(result, 4))
-    return s.passed("declared bounds match the geometry")
+
+    if drifted:
+        # Not a failure: a developer is entitled to work against a newer
+        # apothecary. But the run proved something other than the pin, and a
+        # reader should not have to guess which.
+        return s.passed(
+            f"declared bounds match the geometry, at {local}, not the pinned {APOTHECARY_PIN}"
+        )
+    return s.passed(f"declared bounds match the geometry, at the pinned {APOTHECARY_PIN}")
 
 
 def run_all(root: Path, broker: tuple[str, int] | None) -> list[Step]:

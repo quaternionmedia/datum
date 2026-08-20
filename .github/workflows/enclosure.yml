@@ -1,0 +1,70 @@
+name: Enclosure
+
+# HANDOFF's WP-5 acceptance: "In this repository, CI verifies the pinned
+# apothecary version renders each part it depends on."
+#
+# The enclosure lives in quaternionmedia/apothecary and nowhere else, so this
+# job is the only thing on this side that can fail when a part this project
+# depends on stops rendering. Without it, milestone assertion 5 is checked by
+# whoever happens to have both repositories open, which is not a check.
+#
+# The pin lives in schema/src/datum/hil.py, beside the code that reads it, so
+# there is one statement of which apothecary this project was verified against.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pinned-apothecary-renders-our-parts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install
+        run: uv sync --locked
+
+      - name: Read the pin
+        id: pin
+        run: |
+          echo "repo=$(uv run python -c 'from datum.hil import APOTHECARY_REPO; print(APOTHECARY_REPO)')" >> "$GITHUB_OUTPUT"
+          echo "commit=$(uv run python -c 'from datum.hil import APOTHECARY_PIN; print(APOTHECARY_PIN)')" >> "$GITHUB_OUTPUT"
+          echo "parts=$(uv run python -c 'from datum.hil import APOTHECARY_PARTS; print(" ".join(APOTHECARY_PARTS))')" >> "$GITHUB_OUTPUT"
+
+      - name: Check out the pinned apothecary
+        # If this step fails with "reference is not a tree", the pinned commit
+        # is not published. That is a real finding, not a CI fault: this project
+        # is depending on a state of apothecary nobody else can obtain.
+        run: |
+          git clone --filter=blob:none "${{ steps.pin.outputs.repo }}" ../apothecary
+          git -C ../apothecary checkout "${{ steps.pin.outputs.commit }}"
+
+      - name: Install OpenSCAD
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openscad
+
+      - name: Install apothecary
+        run: uv sync --locked
+        working-directory: ../apothecary
+
+      - name: Every part this project depends on still renders
+        # `parts verify` renders the part and measures its real bounding box
+        # against the envelope its wrapper declares, exiting non-zero on drift.
+        run: |
+          for part in ${{ steps.pin.outputs.parts }}; do
+            echo "::group::$part"
+            uv run apothecary parts info "$part" --json-out
+            uv run apothecary parts generate-stl "$part" --force
+            uv run apothecary parts verify "$part"
+            echo "::endgroup::"
+          done
+        working-directory: ../apothecary
