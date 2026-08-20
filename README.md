@@ -60,15 +60,50 @@ than maintained:
 Elsewhere: [`schema/projections/README.md`](schema/projections/README.md) says
 which axes each transport carries and which it drops.
 
+## The enclosure
+
+All printable geometry lives in `quaternionmedia/apothecary` and no `.scad`
+file lands here. The part is `datum-core`; changing it is a loop across the two
+repositories.
+
+```bash
+# once, in the apothecary checkout — the viewer needs its JS dependencies
+cd ../apothecary && uv run apothecary install
+
+# look at it: one viewer, the assembly navigable to every feature
+uv run apothecary serve --port 8765
+#   http://127.0.0.1:8765/viewer/sites/datum-core     the sub-assembly
+#   http://127.0.0.1:8765/viewer/sites/parts_library  every part
+
+# change parts/datum-core/datum-core.scad, then
+uv run apothecary parts generate-stl datum-core        # render it
+uv run apothecary parts verify datum-core              # bounds vs real geometry
+
+# try a value without editing the file
+uv run apothecary parts generate-stl datum-core -p walls=2.4
+
+# back here: does this project still agree with what you made?
+cd ../datum && uv run datum hil
+```
+
+Select a part in the viewer and its panel carries every parameter as a control,
+plus any number this project's sources disagree about — with each candidate's
+provenance, so a choice can be made by looking. Three of `datum-core`'s
+dimensions are in that state today.
+
+`apothecary/walkthrough/` is the reference and is executable; this is the short
+form. Which apothecary this project is verified against is pinned in
+`datum.hil`, and `datum hil` reports the one it actually used.
+
 ## Not here yet
 
 - **Hardware.** No KiCad project. `firmware/` holds an ESPHome configuration
-  that `esphome config` reports valid and that CI is set up to compile, but no
-  compile has run anywhere yet and nothing here has been flashed to a board, so
-  milestone assertion 2 still rides on a captured stand-in.
+  that `esphome config` reports valid and that CI compiles, but nothing here
+  has been flashed to a board, so milestone assertion 2 still rides on a
+  captured stand-in.
 - **The license gate.** REUSE is wired; the dependency-manifest gate is not.
-- **Enclosure.** All printable geometry lives in `quaternionmedia/apothecary`.
-  No `.scad` files land here.
+- **A fitted enclosure.** `datum-core` exists and every dimension in it is an
+  assumption: there is no schematic to check it against.
 - **Remote detention.** A module can be detained locally, not from a phone.
 
 ## Governance
