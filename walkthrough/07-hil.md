@@ -24,7 +24,7 @@ Datum -- pre-HIL proof run
   [SKIP] Wire contract            DATUM_BROKER not set
   [PASS] Firmware configuration   configuration is valid
   [PASS] Firmware seam            YAML and constants agree
-  [PASS] Enclosure bounds         declared bounds match the geometry, at the pinned f1bf775
+  [PASS] Enclosure bounds         declared bounds match the geometry, at the pinned 3039851
 
 6 proved, 0 failed, 1 skipped
 ```
