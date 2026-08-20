@@ -16,7 +16,8 @@ without hardware and prints the remaining IRL cases. See
 
 ## Proven, locally and repeatably
 
-- [x] `uv run pytest` — 25 collected, 24 passed, 1 skipped
+- [x] `uv run pytest` is green. The count is not written here: a number beside
+      a suite that grows is a second copy of what the suite already reports
 - [x] The skip is `walkthrough/08-wire.md`, which needs a broker and says so
 - [x] Ten checked-in vectors: six accepted, four rejected, each leaving a report
 - [x] A v1-pinned consumer parses a capability-extended event and yields an

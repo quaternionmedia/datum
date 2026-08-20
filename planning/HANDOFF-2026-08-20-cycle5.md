@@ -19,10 +19,13 @@ That prints what is proven and what still needs a bench. Then read
 
 ## The two pull requests
 
-| | Branch | PR | Commits | CI |
-|---|---|---|---|---|
-| datum | `wp3-firmware` | [#2](https://github.com/quaternionmedia/datum/pull/2) | 18 | 6/6 green |
-| apothecary | `prototype/site-structure-hierarchy` | [#18](https://github.com/quaternionmedia/apothecary/pull/18) | 18 | 5/5 green |
+| | Branch | PR |
+|---|---|---|
+| datum | `wp3-firmware` | [#2](https://github.com/quaternionmedia/datum/pull/2) |
+| apothecary | `prototype/site-structure-hierarchy` | [#18](https://github.com/quaternionmedia/apothecary/pull/18) |
+
+Both were green when this was written. `gh pr checks` is the current answer;
+a status copied into prose is stale the next time anyone pushes.
 
 **Merge apothecary first.** `datum.hil.APOTHECARY_PIN` names an apothecary
 commit, and `.github/workflows/enclosure.yml` checks it out. Merging datum
@@ -139,12 +142,16 @@ every off-origin request.
 ## Verification, as of this handoff
 
 ```
-datum        uv run pytest              26 passed, 1 skipped
+datum        uv run pytest              green, one skip
              uv run datum hil           6 proved, 0 failed, 1 skipped
              reuse lint                 compliant
-apothecary   pytest walkthrough tests   432 passed, 2 skipped  (from a cold
-                                        checkout with every STL deleted)
+apothecary   pytest walkthrough tests   green, two skips (from a cold checkout
+                                        with every STL deleted)
 ```
+
+Counts are deliberately absent. Both suites grow, and a number written here is
+a second copy of what running them reports — this page had one that was stale
+within the hour.
 
 The one skip in datum is `walkthrough/08-wire.md`, which needs a broker and
 says so. Start one and it runs:

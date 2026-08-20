@@ -6,7 +6,7 @@ Advance schema-to-firmware-to-HIL readiness with verifiable local checkpoints.
 
 ## Current state
 
-- Local baseline is green: 19 passed, 1 skipped via uv run pytest.
+- Local baseline is green via `uv run pytest`; the one skip is `walkthrough/08-wire.md`, which needs a broker and says so.
 - HIL checklist exists and is ready for BOM-driven execution.
 - WP-3 firmware configuration exists and is checked against the constants.
   Nothing has been flashed, so WP-3 is open and assertion 2 stays qualified.
