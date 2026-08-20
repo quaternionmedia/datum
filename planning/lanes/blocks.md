@@ -18,6 +18,20 @@ Use this file for blockers that can prevent HIL completion or release readiness.
       check the footprint, connector height, indicator position or the tallest
       component that sets headroom.
 
+## Decisions waiting on a human, 2026-08-20
+
+Both are about the enclosure, both are visible in apothecary's viewer, and
+`planning/HANDOFF-2026-08-20-cycle5.md` carries the full account.
+
+- [ ] **Two datum enclosure parts exist.** `parts/datum/` arrived on
+      apothecary's main after this branch forked (board 40 x 30, wall 2.4);
+      `parts/datum-core/` is ours (40 x 40, wall 3). They describe one object
+      and one should absorb the other.
+- [ ] **The house constants disagree, and one side misquotes the record.** The
+      enclosure record's clause 3 says walls 3 and tolerence .4;
+      `parts/datum/datum.scad` uses 2.4 and 0.2 while citing that record for
+      values it does not contain. Both are on sliders with their provenance.
+
 ## Governance findings, 2026-08-19
 
 Raised by reading the corpus rather than `AGENTS.md`'s summary of it. Two are

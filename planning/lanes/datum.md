@@ -59,6 +59,18 @@ Advance schema-to-firmware-to-HIL readiness with verifiable local checkpoints.
   `seq->value()++` into `str_sprintf`. `ch` changed from `%u` to `%d` to match.
 - 2026-08-18: `uv run pytest` -> 19 passed, 1 skipped after all of the above.
 
+## Evidence, 2026-08-20
+
+- CI compiled `firmware/t1-core.yaml` for the first time: `build (t1-core.yaml)`
+  green in about five minutes on pull request #2. The claim that had never been
+  checked anywhere is checked.
+- `pinned-apothecary-renders-our-parts` green: the enclosure this project
+  depends on renders at the pinned apothecary, in CI, rather than on whichever
+  machine happens to have both repositories open.
+- `docs-are-tests` green against a real Mosquitto container, so
+  `walkthrough/08-wire.md` ran rather than skipping.
+- `uv run datum hil` -> 6 proved, 0 failed, 1 skipped.
+
 ## Done criteria for this lane
 
 - A BOM-backed HIL test matrix exists.

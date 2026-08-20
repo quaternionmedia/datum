@@ -23,21 +23,29 @@ clause 2).
 **WP-0, WP-1 and WP-2 are complete. WP-3 is under way and is not done.**
 `main` is pushed and is the published state; work reaches it as pull requests.
 
-WP-3's configuration exists and `esphome config` reports it valid on ESPHome
-2026.7.4; `walkthrough/04-firmware.md` checks its topics and payloads against the
-constants. The compile itself has not been proven anywhere yet — `esphome
-compile` reaches codegen and then fails installing the ESP-IDF framework on
-Windows, so `firmware.yml` on Linux is what settles it. **Nothing has been
-flashed.** WP-3
-closes when a real device produces a real capture, and until it does, assertion
-2 stays qualified exactly as it was — see below. Do not read a green firmware
-build as a working button.
+WP-3's configuration exists, `esphome config` reports it valid on ESPHome
+2026.7.4, and **it now compiles**: `firmware.yml` builds `t1-core.yaml` in CI
+in about five minutes, on pull request #2. That was the project's longest
+unproven claim. `walkthrough/04-firmware.md` checks the configuration's topics
+and payload templates against the Python constants, byte for byte.
+
+**Nothing has been flashed.** WP-3 closes when a real device produces a real
+capture, and until it does, assertion 2 stays qualified exactly as it was — see
+below. Do not read a green firmware build as a working button: a compile proves
+the configuration is buildable and says nothing about a contact on a bench.
+
+Work is on `wp3-firmware`, pushed, as pull request #2, with six checks green
+and nothing merged. The enclosure it depends on is pull request #18 in
+apothecary, which merges first because `datum.hil.APOTHECARY_PIN` names a
+commit on that branch. `planning/HANDOFF-2026-08-20-cycle5.md` is the full
+account, including the two decisions waiting on a human.
 
 What exists:
 
 | | |
 |---|---|
-| Project repository | `main`. Governance wiring, the schema package, the retrofit demo, the wire harness, and the ESPHome configuration at `firmware/`. No hardware, no geometry. |
+| Project repository | `main`, plus `wp3-firmware` as pull request #2. Governance wiring, the schema package, the retrofit demo, the wire harness, the ESPHome configuration at `firmware/`, and the pre-HIL runner behind `datum hil`. No hardware, no geometry. |
+| Enclosure | `datum-core` in apothecary, on pull request #18 there, pinned from `datum.hil` and rendered by CI. Every dimension is an assumption; three are disputed. |
 | `governance/qm` submodule | Pinned to `project/datum`. |
 | Decision records | Nine, numberless, at `governance/qm/adr/`. None is an adoption record. |
 | CI | `adr-lint.yml`, `reuse-lint.yml` and `submodule-check.yml` (seed, verbatim), plus `schema.yml`, which runs the documentation against a Mosquitto service container, and `firmware.yml`, which validates and compiles the ESPHome configuration in a matrix. |
