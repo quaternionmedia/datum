@@ -159,12 +159,12 @@ Record high-discipline decisions with context and consequences.
 
 - Date: 2026-08-18
 - Scope: Integration
-- Decision: The enclosure lands in apothecary as `datum-core`, parameterised
+- Decision: The enclosure lands in apothecary as `datum_core`, parameterised
   against a generic 40 x 40 mm board rather than against this project's PCB.
 - Why now: The user asked for a parts iteration view with datum loaded. The
   geometry non-negotiable puts all of it in apothecary and requires a part to
   render coherently from its defaults knowing nothing about the PCB.
-- Evidence: `apothecary parts info datum-core` reports 45.6 x 45.6 x 15.6 mm;
+- Evidence: `apothecary parts info datum_core` reports 45.6 x 45.6 x 15.6 mm;
   STL generation exits 0; the part appears in the `parts_library` site tree.
 - Consequences: This is WP-5 work arriving before WP-4, so every dimension is
   an assumption. The part README says which ones must be checked against a
@@ -175,11 +175,11 @@ Record high-discipline decisions with context and consequences.
 - Date: 2026-08-18
 - Scope: Apothecary
 - Decision: `apothecary parts info` reports the part's bounding box.
-- Why now: Datum's milestone assertion 5 is "`apothecary parts info datum-core`
+- Why now: Datum's milestone assertion 5 is "`apothecary parts info datum_core`
   returns the part with non-null bounds", and the command reported no bounds at
   all, so the assertion was not satisfiable as written.
 - Evidence: `--json-out` now carries a `bounds` object; a regression test pins
-  the datum-core envelope.
+  the datum_core envelope.
 - Consequences: Parts that set neither `get_bounds` nor `default_bounds` report
   null, which is honest rather than a guess.
 - Follow-up: Wire the assertion into datum CI at WP-5/WP-6.

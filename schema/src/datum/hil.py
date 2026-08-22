@@ -33,8 +33,8 @@ DEFAULT_MQTT_PORT = 1883
 # Bumping the pin is a reviewed commit here, the same way the governance
 # submodule's pin is.
 APOTHECARY_REPO = "https://github.com/quaternionmedia/apothecary"
-APOTHECARY_PIN = "4de62c0"
-APOTHECARY_PARTS = ("datum-core",)
+APOTHECARY_PIN = "3f8d5c1"
+APOTHECARY_PARTS = ("datum_core",)
 
 # The cases nothing on a desk can close. Kept beside the runner so the list a
 # reviewer is told to work through is the list the code prints; walkthrough/07-hil.md
@@ -325,7 +325,7 @@ def step_firmware_seam(root: Path) -> Step:
 
 def step_enclosure(root: Path) -> Step:
     """The enclosure lives in apothecary and nowhere else, so this reaches across."""
-    s = Step("Enclosure bounds", "datum-core declared envelope vs rendered geometry")
+    s = Step("Enclosure bounds", "datum_core declared envelope vs rendered geometry")
     apothecary = root.parent / "apothecary"
     if not apothecary.is_dir():
         return s.skipped(f"no apothecary checkout at {apothecary}")
@@ -340,7 +340,7 @@ def step_enclosure(root: Path) -> Step:
     )
 
     result = _run(
-        ["uv", "run", "apothecary", "parts", "verify", "datum-core"], apothecary, timeout=600
+        ["uv", "run", "apothecary", "parts", "verify", "datum_core"], apothecary, timeout=600
     )
     if result.returncode != 0:
         if "OpenSCAD not found" in (result.stdout + result.stderr):

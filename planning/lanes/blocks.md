@@ -14,7 +14,7 @@ Use this file for blockers that can prevent HIL completion or release readiness.
       `esphome compile` fails on this Windows machine installing the ESP-IDF
       5.5.5 framework -- an environment failure, reached after codegen and
       before the compiler. CI on Linux is what settles it.
-- [ ] datum-core enclosure dimensions are assumptions. No schematic exists to
+- [ ] datum_core enclosure dimensions are assumptions. No schematic exists to
       check the footprint, connector height, indicator position or the tallest
       component that sets headroom.
 
@@ -25,7 +25,7 @@ Both are about the enclosure, both are visible in apothecary's viewer, and
 
 - [ ] **Two datum enclosure parts exist.** `parts/datum/` arrived on
       apothecary's main after this branch forked (board 40 x 30, wall 2.4);
-      `parts/datum-core/` is ours (40 x 40, wall 3). They describe one object
+      `parts/datum_core/` is ours (40 x 40, wall 3). They describe one object
       and one should absorb the other.
 - [ ] **The house constants disagree, and one side misquotes the record.** The
       enclosure record's clause 3 says walls 3 and tolerence .4;

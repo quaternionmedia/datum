@@ -45,7 +45,7 @@ What exists:
 | | |
 |---|---|
 | Project repository | `main`, plus `wp3-firmware` as pull request #2. Governance wiring, the schema package, the retrofit demo, the wire harness, the ESPHome configuration at `firmware/`, and the pre-HIL runner behind `datum hil`. No hardware, no geometry. |
-| Enclosure | `datum-core` in apothecary, on pull request #18 there, pinned from `datum.hil` and rendered by CI. Every dimension is an assumption; three are disputed. |
+| Enclosure | `datum_core` in apothecary, on pull request #18 there, pinned from `datum.hil` and rendered by CI. Every dimension is an assumption; three are disputed. |
 | `governance/qm` submodule | Pinned to `project/datum`. |
 | Decision records | Nine, numberless, at `governance/qm/adr/`. None is an adoption record. |
 | CI | `adr-lint.yml`, `reuse-lint.yml` and `submodule-check.yml` (seed, verbatim), plus `schema.yml`, which runs the documentation against a Mosquitto service container, and `firmware.yml`, which validates and compiles the ESPHome configuration in a matrix. |
@@ -459,7 +459,7 @@ board.
 
 **Path:** `quaternionmedia/apothecary`, not this repository.
 
-**Deliverables:** `datum-core`, `datum-cap`, `datum-mount-desk`, each as
+**Deliverables:** `datum_core`, `datum_cap`, `datum-mount-desk`, each as
 `parts/<name>/<name>.scad` plus `apothecary/projects/parts/<name>.py` with a
 Pydantic `Params`, `category`, `tags`, `description`, `print_settings` and
 `display_rotation`. Follow `parts/README.md` and `docs/parts-authoring.md`
@@ -476,7 +476,7 @@ underscored.
   the switch dome and the USB cutout.
 - Defaults must render something coherent with no knowledge of this project.
 
-**Acceptance (M1 assertion 5):** `apothecary parts info datum-core` returns
+**Acceptance (M1 assertion 5):** `apothecary parts info datum_core` returns
 the part with non-null bounds; `apothecary parts generate-stl` exits 0;
 apothecary's own test suite passes. In this repository, CI verifies the pinned
 apothecary version renders each part it depends on.
@@ -514,7 +514,7 @@ All six assertions green in CI:
 3. A v1-pinned consumer parses a capability-extended event and yields an
    identical `action`. (WP-1)
 4. KiBot ERC and DRC exit 0; the CC-termination check passes. (WP-4)
-5. `apothecary parts info datum-core` returns non-null bounds; STL generation
+5. `apothecary parts info datum_core` returns non-null bounds; STL generation
    exits 0. (WP-5)
 6. License and REUSE gates report zero violations; every BOM line has two or
    more sources. (WP-4, WP-6)

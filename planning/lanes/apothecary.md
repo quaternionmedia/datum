@@ -15,7 +15,7 @@ Drive enclosure and fit functionality as a first-class iteration partner to Datu
 - [x] Define first-pass enclosure functionality checklist (fit, USB opening, indicator visibility, mounting).
 - [x] Identify minimum parameter contract needed from Datum board assumptions.
 - [x] Propose one iteration that can be validated before full hardware availability.
-- [ ] Check the datum-core dimensions against a real schematic when WP-4 exists.
+- [ ] Check the datum_core dimensions against a real schematic when WP-4 exists.
 - [x] Build the tooling to iterate the enclosure without editing source between
       attempts: `-p name=value` overrides and a declared-vs-measured bounds gate.
 - [x] Add OpenSCAD readiness output to `apothecary check` for faster local diagnosis.
@@ -43,14 +43,14 @@ Drive enclosure and fit functionality as a first-class iteration partner to Datu
 - 2026-08-18: `apothecary serve` and `apothecary check` both died on Windows --
   cp1252 cannot encode the check mark they print first. 45 call sites across
   check, serve, testing and parts now go through `_safe_echo`.
-- 2026-08-18: added the `datum-core` part: parametric tray and lid, four
+- 2026-08-18: added the `datum_core` part: parametric tray and lid, four
   standoffs, edge-connector cutout, indicator light pipe, four contact openings.
-- 2026-08-18: `apothecary parts info datum-core` reports bounds 45.6 x 45.6 x
-  15.6 mm; `apothecary parts generate-stl datum-core` exits 0.
+- 2026-08-18: `apothecary parts info datum_core` reports bounds 45.6 x 45.6 x
+  15.6 mm; `apothecary parts generate-stl datum_core` exits 0.
 - 2026-08-18: `uv run pytest tests/test_api.py tests/test_cli.py -q` -> 15 passed.
-- 2026-08-18: server up on :8765, `datum-core` present in `/parts`, in the
+- 2026-08-18: server up on :8765, `datum_core` present in `/parts`, in the
   `parts_library` site tree, and reachable at
-  `/viewer/sites/parts_library?focus=datum-core`.
+  `/viewer/sites/parts_library?focus=datum_core`.
 
 ## Done criteria for this lane
 
@@ -74,7 +74,7 @@ The loop is now `generate-stl -p` then `verify -p`, with the viewer reloading.
 ### What the gate found
 
 Four of the six parts declaring bounds are wrong. Only `calibration_cube` and
-`datum-core` agree with their geometry.
+`datum_core` agree with their geometry.
 
 | Part | Declared | Measured |
 |---|---|---|
@@ -86,7 +86,7 @@ Four of the six parts declaring bounds are wrong. Only `calibration_cube` and
 Recorded in apothecary's `todo.md`, not fixed: which side is authoritative
 belongs to whoever owns each part.
 
-It also caught one of ours. `datum-core`'s exploded preview declared 32.6 mm and
+It also caught one of ours. `datum_core`'s exploded preview declared 32.6 mm and
 measured 29.6 -- the lid's lip hung into the gap, so `explode_gap` was not the
 separation it claimed. Fixed in the geometry rather than in the number.
 

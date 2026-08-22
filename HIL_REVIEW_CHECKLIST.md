@@ -26,7 +26,7 @@ without hardware and prints the remaining IRL cases. See
       on ESPHome 2026.7.4
 - [x] The firmware seam holds: topics and payload templates read back out of
       the YAML match the Python constants byte for byte
-- [x] `apothecary parts verify datum-core` — declared bounds match geometry
+- [x] `apothecary parts verify datum_core` — declared bounds match geometry
 - [x] `reuse lint` clean
 - [x] Governance brief reviewed: `AGENTS.md`, `HANDOFF.md`, `PLAN.md`
 - [x] The firmware compiles: `Firmware` green in CI on the pull request
@@ -45,7 +45,7 @@ describes.
       compiler runs. `.github/workflows/firmware.yml` on Linux is the only
       thing that can settle it, and it has not run because nothing is pushed.
 - [ ] **The enclosure has never been fitted to anything.** Every dimension in
-      `datum-core` is an assumption; no schematic exists to check it against.
+      `datum_core` is an assumption; no schematic exists to check it against.
 - [ ] **No BOM.** Every hardware line below is staged, not executable.
 
 ## Needs a board on a bench
@@ -92,8 +92,8 @@ wiring: [`firmware/README.md`](firmware/README.md).
 
 ### Enclosure and integration
 
-- [x] Publish apothecary-side geometry — `datum-core`, tray and lid
-- [x] `apothecary parts info datum-core` returns non-null bounds, STL exits 0 —
+- [x] Publish apothecary-side geometry — `datum_core`, tray and lid
+- [x] `apothecary parts info datum_core` returns non-null bounds, STL exits 0 —
       milestone assertion 5
 - [ ] Re-fit every assumed dimension against the real board outline
 - [ ] Validate fit between board, case, USB opening and indicator opening

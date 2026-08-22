@@ -14,7 +14,7 @@ Keep Datum and Apothecary in lockstep by managing explicit cross-repo contracts.
 ## Next actions
 
 - [x] Rank contract freeze order for earliest risk reduction.
-- [x] Give the contracts a real artifact to argue against: `datum-core` in
+- [x] Give the contracts a real artifact to argue against: `datum_core` in
       apothecary carries all four as named parameters.
 - [ ] Define change-impact notes for each contract.
 - [ ] Add a simple compatibility checklist for every iteration.
@@ -69,7 +69,7 @@ can obtain.
 
 ## Where each contract currently lives
 
-| Contract | Parameter in `datum-core` | Value | Status |
+| Contract | Parameter in `datum_core` | Value | Status |
 |---|---|---|---|
 | Board outline and tolerance | `board_x`, `board_y`, `board_clearance` | 40, 40, 0.4 | assumed |
 | Connector opening and clearance | `connector_w`, `connector_h`, `connector_margin` | 9.4, 3.6, 0.6 | assumed |

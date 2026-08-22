@@ -44,7 +44,7 @@ prevent, and `walkthrough/08-wire.md` already says so about itself.
 | **Wire contract** | Topics, encoding, retention and a late subscriber, over a real broker |
 | **Firmware configuration** | `esphome config` resolves every wire-critical string in the YAML |
 | **Firmware seam** | The topics and payload templates read back out of the YAML and compared to the constants |
-| **Enclosure bounds** | `datum-core`'s declared envelope measured against the geometry OpenSCAD emits, and which apothecary that was |
+| **Enclosure bounds** | `datum_core`'s declared envelope measured against the geometry OpenSCAD emits, and which apothecary that was |
 
 ## Getting the wire contract to run
 
