@@ -23,6 +23,21 @@ dev = [
     "paho-mqtt>=2.1",
 ]
 
+# What `datum preflight` needs to run the workflows the way CI does. The
+# workflows install their own tools with `python -m pip install ...`, and a
+# uv-managed environment has no pip, so those steps fail for an environment
+# reason rather than a real one. Mirrors governance/qm's own `preflight` extra.
+#
+#     uv sync --group preflight
+preflight = [
+    "pip",
+    "pyyaml>=6.0",
+    # The extra, not bare `reuse`: without it the package wants libmagic at
+    # import time and dies before it lints anything. A Windows box has no
+    # libmagic; the runner image does.
+    "reuse[charset-normalizer]>=3.0",
+]
+
 [tool.uv]
 package = true
 

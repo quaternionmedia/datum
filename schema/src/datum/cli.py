@@ -100,6 +100,164 @@ def validate(path: Path, report: Path | None) -> None:
     click.echo(f"{len(payloads)} event(s) valid")
 
 
+@cli.command(
+    context_settings={"ignore_unknown_options": True},
+)
+@click.argument("passthrough", nargs=-1, type=click.UNPROCESSED)
+def preflight(passthrough: tuple[str, ...]) -> None:
+    """Run this repository's CI workflows locally, before pushing.
+
+    Delegates to the governance corpus's own runner rather than restating what
+    the workflows do. A second list of "what CI runs" is a list that drifts,
+    and the point of running them here is to find out what the runner will say
+    -- which a paraphrase cannot tell you.
+
+    Arguments pass straight through:
+
+        datum preflight                          # a pull request into main
+        datum preflight --event push --ref main
+
+    A pass here is evidence, not proof. `uses:` steps and the runner image are
+    not reproduced, this machine carries tools a fresh runner does not, and
+    three of these gates cannot run on Windows at all -- each is named in the
+    output rather than quietly skipped. `walkthrough/09-preflight.md` has the
+    local equivalent for each one.
+    """
+    import shutil
+    import subprocess
+
+    root = Path(__file__).resolve()
+    runner = repo = None
+    for parent in root.parents:
+        candidate = parent / "governance" / "qm" / "project-seed" / "ci" / "run_workflows_locally.py"
+        if candidate.exists():
+            runner, repo = candidate, parent
+            break
+
+    if runner is None:
+        raise click.ClickException(
+            """
+The governance submodule is not checked out, so its workflow runner is
+not here:
+    git submodule update --init --recursive
+This repository has been in that state before, and everything was read
+out of a summary of documents nobody could open."""
+        )
+
+    try:
+        import yaml  # noqa: F401
+    except ImportError:
+        raise click.ClickException(
+            """
+The runner needs pyyaml, and the workflows install their own tools with
+pip:
+    uv run --group preflight datum preflight
+`uv run` re-syncs the environment and drops the group, so the group has
+to be named on the command that runs, not on a sync beforehand."""
+        ) from None
+
+    # The workflows install their own tools, and `actions/setup-python` is an
+    # environment step the runner does not reproduce -- so `python -m pip
+    # install esphome` lands wherever `python` points. On this machine that was
+    # the system interpreter, which refused it for lack of permission; with
+    # permission it would have installed ESPHome into the user's global Python.
+    # `uv sync --locked` is the same hazard aimed at .venv: it strips whatever
+    # the project lockfile does not name, including the tools later jobs need.
+    #
+    # So preflight runs against a scratch environment it owns. Nothing it does
+    # reaches the interpreter you work in.
+    scratch = repo / ".preflight" / "venv"
+    bin_dir = scratch / ("Scripts" if os.name == "nt" else "bin")
+
+    def ensure_scratch() -> None:
+        if not bin_dir.exists():
+            click.echo(f"Creating the preflight environment in {scratch} ...")
+            # --seed: the workflows call `python -m pip`, and a bare uv venv
+            # has no pip at all.
+            subprocess.check_call(["uv", "venv", "--seed", str(scratch)])
+        # reuse-lint.yml installs plain `reuse`, which imports libmagic at
+        # start-up and dies before it lints anything on a box with no `file`
+        # command. Seeding the charset-normalizer extra leaves pip's later
+        # `install reuse` satisfied, so the gate runs instead of reporting a
+        # Windows fact as a licensing failure. Re-seeded every time because a
+        # previous workflow's `uv sync --locked` strips it back out.
+        subprocess.check_call(
+            ["uv", "pip", "install", "--quiet", "--python", str(scratch),
+             "reuse[charset-normalizer]"]
+        )
+
+    env = dict(os.environ)
+    env["UV_PROJECT_ENVIRONMENT"] = str(scratch)
+    env["PATH"] = str(bin_dir) + os.pathsep + env.get("PATH", "")
+    env["VIRTUAL_ENV"] = str(scratch)
+
+    # Honour an explicit --workflows and run exactly once: the caller has said
+    # what they want executed.
+    if any(a.startswith("--workflows") for a in passthrough):
+        ensure_scratch()
+        sys.exit(subprocess.call([sys.executable, str(runner), *passthrough], cwd=repo, env=env))
+
+    # Otherwise one invocation per workflow. The runner executes every job in a
+    # single environment; CI gives each job a fresh machine. That difference is
+    # not cosmetic -- enclosure.yml's `uv sync --locked` was stripping the
+    # tools reuse-lint.yml needed, and the licensing gate failed for it.
+    source = repo / ".github" / "workflows"
+    staged_root = repo / ".preflight" / "workflows"
+    if staged_root.exists():
+        shutil.rmtree(staged_root)
+
+    # The split, and the reasons, live in datum.preflight so they can be
+    # tested. A rule that only exists inside a CLI is a rule nothing checks.
+    from .preflight import LOCAL_DIFFERENCES, partition
+
+    names, set_aside = partition(source)
+    runnable = []
+    for name in names:
+        staged = staged_root / Path(name).stem
+        staged.mkdir(parents=True)
+        shutil.copy2(source / name, staged / name)
+        runnable.append((name, staged))
+
+    if set_aside:
+        click.echo("Not run here. CI still runs them:")
+        for name in set_aside:
+            difference = LOCAL_DIFFERENCES.get(name)
+            click.echo(f"  {name} -- {difference.why if difference else 'the runner cannot execute it'}")
+            if difference:
+                click.echo(f"      covered here by: {difference.covered_by}")
+        click.echo("")
+
+    failed = []
+    for name, staged in runnable:
+        ensure_scratch()
+        code = subprocess.call(
+            [sys.executable, str(runner), *passthrough, "--workflows", str(staged)],
+            cwd=repo,
+            env=env,
+        )
+        if code != 0:
+            failed.append(name)
+
+    click.echo("")
+    click.echo("=" * 60)
+    if failed:
+        click.echo(f"{len(failed)} workflow(s) reported a failure: {', '.join(failed)}")
+        click.echo("")
+        click.echo("A local failure is a question: a defect, or a difference between")
+        click.echo("this machine and the runner. These are recorded as the second:")
+        for name in failed:
+            difference = LOCAL_DIFFERENCES.get(name)
+            if difference:
+                click.echo(f"  {name} -- {difference.why}")
+                click.echo(f"      covered here by: {difference.covered_by}")
+            else:
+                click.echo(f"  {name} -- NOT a recorded difference. Read it as a defect.")
+        sys.exit(1)
+    click.echo(f"{len(runnable)} workflow(s) passed locally.")
+    if set_aside:
+        click.echo(f"{len(set_aside)} not run here, named above. A skip is not a pass.")
+
+
 @cli.command()
 @click.option(
     "--broker",

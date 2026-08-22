@@ -43,6 +43,7 @@ needs a broker and says so in its opening line.
 | [`walkthrough/06-cli.md`](walkthrough/06-cli.md) | `datum version`, `validate`, `emit`, `hil` |
 | [`walkthrough/07-hil.md`](walkthrough/07-hil.md) | One command that proves everything provable without hardware, and names what is left |
 | [`walkthrough/08-wire.md`](walkthrough/08-wire.md) | The same contract over a real MQTT broker |
+| [`walkthrough/09-preflight.md`](walkthrough/09-preflight.md) | Run the CI gates here first, and what cannot run here |
 
 That table is the registry's only rendering, and a rendering that disagrees
 with the directory is how a page stops being read. So it is checked rather
