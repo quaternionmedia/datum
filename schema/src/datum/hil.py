@@ -30,11 +30,18 @@ DEFAULT_MQTT_PORT = 1883
 # checked out next door": a sibling directory is a convenience for a developer
 # with both repositories open, and no statement at all about what CI verified.
 #
-# Bumping the pin is a reviewed commit here, the same way the governance
-# submodule's pin is.
-APOTHECARY_REPO = "https://github.com/quaternionmedia/apothecary"
-APOTHECARY_PIN = "27efaf7"
-APOTHECARY_PARTS = ("datum_core",)
+# The declaration and the rule it has to satisfy live in datum.apothecary.
+# Re-exported here because `.github/workflows/enclosure.yml` reads them from
+# this module, and a second definition is how the workflow and the check come
+# to disagree about which apothecary was verified.
+from .apothecary import (  # noqa: E402  (re-export, kept beside its users)
+    APOTHECARY_PARTS,
+    APOTHECARY_PIN,
+    APOTHECARY_REPO,
+    APOTHECARY_VERSION,
+    checkout_ref,
+    describe,
+)
 
 # The cases nothing on a desk can close. Kept beside the runner so the list a
 # reviewer is told to work through is the list the code prints; walkthrough/07-hil.md
@@ -323,6 +330,30 @@ def step_firmware_seam(root: Path) -> Step:
     return s.passed("YAML and constants agree")
 
 
+def step_dependency(root: Path) -> Step:
+    """Whether this project's reference to apothecary is the kind clause 5 allows.
+
+    Separate from the geometry check on purpose. "The bounds still match" and
+    "we are allowed to depend on this at all" are different questions, and
+    answering only the first is how the second went unasked for a whole cycle.
+    """
+    from .apothecary import FAIL, UNKNOWN, WARN, current
+
+    s = Step("Apothecary dependency", "a released version, per the enclosure record")
+    dependency, _ = current()
+
+    if dependency.state == UNKNOWN:
+        return s.skipped(dependency.summary)
+    if dependency.state == FAIL:
+        return s.failed(f"{dependency.summary} -- {dependency.fix}")
+    if dependency.state == WARN:
+        # Recorded, not passed. The clause cannot be met by anyone until
+        # apothecary publishes something, so failing here would be demanding
+        # that this project fix a thing it does not own.
+        return s.skipped(f"{dependency.summary} -- {dependency.fix}")
+    return s.passed(dependency.summary)
+
+
 def step_enclosure(root: Path) -> Step:
     """The enclosure lives in apothecary and nowhere else, so this reaches across."""
     s = Step("Enclosure bounds", "datum_core declared envelope vs rendered geometry")
@@ -359,5 +390,6 @@ def run_all(root: Path, broker: tuple[str, int] | None) -> list[Step]:
         step_wire(root, broker),
         step_firmware(root),
         step_firmware_seam(root),
+        step_dependency(root),
         step_enclosure(root),
     ]

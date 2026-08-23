@@ -44,6 +44,7 @@ needs a broker and says so in its opening line.
 | [`walkthrough/07-hil.md`](walkthrough/07-hil.md) | One command that proves everything provable without hardware, and names what is left |
 | [`walkthrough/08-wire.md`](walkthrough/08-wire.md) | The same contract over a real MQTT broker |
 | [`walkthrough/09-preflight.md`](walkthrough/09-preflight.md) | Run the CI gates here first, and what cannot run here |
+| [`walkthrough/10-the-enclosure-dependency.md`](walkthrough/10-the-enclosure-dependency.md) | What this project depends on in apothecary, and the rule that dependency has to satisfy |
 
 That table is the registry's only rendering, and a rendering that disagrees
 with the directory is how a page stops being read. So it is checked rather
@@ -89,12 +90,20 @@ cd ../datum && uv run datum hil
 
 Select a part in the viewer and its panel carries every parameter as a control,
 plus any number this project's sources disagree about — with each candidate's
-provenance, so a choice can be made by looking. Three of `datum_core`'s
-dimensions are in that state today.
+provenance, so a choice can be made by looking. `apothecary parts checklist
+datum_core` lists which are in that state right now.
 
 `apothecary/walkthrough/` is the reference and is executable; this is the short
-form. Which apothecary this project is verified against is pinned in
-`datum.hil`, and `datum hil` reports the one it actually used.
+form.
+
+**The sibling checkout above is a convenience, not the dependency.** What this
+project actually depends on is declared in `datum.apothecary`, and the
+enclosure record is specific about what that is allowed to be: a *released*
+apothecary version, consumed through its CLI. Apothecary has published no
+release yet, so this pins a commit and says so on every run —
+`datum apothecary` prints the state, `datum hil` carries it as a step, and CI
+fails the moment a release exists and this still points at a commit.
+`walkthrough/10-the-enclosure-dependency.md` is the whole rule.
 
 ## Not here yet
 

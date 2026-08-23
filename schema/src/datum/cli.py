@@ -100,6 +100,56 @@ def validate(path: Path, report: Path | None) -> None:
     click.echo(f"{len(payloads)} event(s) valid")
 
 
+@cli.command()
+@click.option(
+    "--check",
+    "check_only",
+    is_flag=True,
+    help="Exit non-zero if the dependency is not the kind the record allows.",
+)
+def apothecary(check_only: bool) -> None:
+    """What this project depends on in apothecary, and whether that is legal.
+
+    The enclosure record's clause 5 asks for a released apothecary version,
+    pinned, consumed through the CLI rather than by path. A commit pin
+    satisfies "pinned" and misses "released", and the difference matters: a
+    commit on an unmerged branch is a state nobody else can obtain.
+
+    The gate arms itself. While apothecary publishes no release the clause
+    cannot be met by anybody, so this reports the deviation and exits 0. Once a
+    release exists, depending on a bare commit is a choice, and `--check`
+    exits 1.
+    """
+    from .apothecary import (
+        APOTHECARY_PARTS,
+        APOTHECARY_REPO,
+        FAIL,
+        UNKNOWN,
+        WARN,
+        current,
+        describe,
+    )
+
+    dependency, available = current()
+
+    click.echo(f"repository  {APOTHECARY_REPO}")
+    click.echo(f"depends on  {describe()}")
+    click.echo(f"parts       {', '.join(APOTHECARY_PARTS)}")
+    if available is None:
+        click.echo("published   could not ask")
+    else:
+        click.echo(f"published   {', '.join(available) if available else 'nothing yet'}")
+    click.echo("")
+
+    mark = {"pass": "OK  ", FAIL: "FAIL", WARN: "----", UNKNOWN: "????"}[dependency.state]
+    click.echo(f"[{mark}] {dependency.summary}")
+    if dependency.fix:
+        click.echo(f"       {dependency.fix}")
+
+    if check_only and not dependency.ok:
+        sys.exit(1)
+
+
 @cli.command(
     context_settings={"ignore_unknown_options": True},
 )
