@@ -40,3 +40,7 @@ firmware/.esphome/
 # against this project's board dimensions and land upstream as pull requests,
 # never here. Nothing under sandbox/ is part of this repository.
 sandbox/
+
+# `datum preflight` runs the workflows against an environment it owns, so
+# nothing CI does reaches the interpreter you work in.
+.preflight/

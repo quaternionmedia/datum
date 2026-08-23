@@ -20,17 +20,35 @@ clause 2).
 
 ## State on arrival
 
-**WP-0, WP-1 and WP-2 are complete. WP-3 (firmware) is next.** `main` is
-pushed and is the published state; work reaches it as pull requests.
+**WP-0, WP-1 and WP-2 are complete. WP-3 is under way and is not done.**
+`main` is pushed and is the published state; work reaches it as pull requests.
+
+WP-3's configuration exists, `esphome config` reports it valid on ESPHome
+2026.7.4, and **it now compiles**: `firmware.yml` builds `t1-core.yaml` in CI
+in about five minutes, on pull request #2. That was the project's longest
+unproven claim. `walkthrough/04-firmware.md` checks the configuration's topics
+and payload templates against the Python constants, byte for byte.
+
+**Nothing has been flashed.** WP-3 closes when a real device produces a real
+capture, and until it does, assertion 2 stays qualified exactly as it was — see
+below. Do not read a green firmware build as a working button: a compile proves
+the configuration is buildable and says nothing about a contact on a bench.
+
+Work is on `wp3-firmware`, pushed, as pull request #2, with six checks green
+and nothing merged. The enclosure it depends on is pull request #18 in
+apothecary, which merges first because `datum.hil.APOTHECARY_PIN` names a
+commit on that branch. `planning/HANDOFF-2026-08-20-cycle5.md` is the full
+account, including the two decisions waiting on a human.
 
 What exists:
 
 | | |
 |---|---|
-| Project repository | `main`. Governance wiring, the schema package, the retrofit demo, and the wire harness. No firmware, no hardware, no geometry. |
+| Project repository | `main`, plus `wp3-firmware` as pull request #2. Governance wiring, the schema package, the retrofit demo, the wire harness, the ESPHome configuration at `firmware/`, and the pre-HIL runner behind `datum hil`. No hardware, no geometry. |
+| Enclosure | `datum_core` in apothecary, on pull request #18 there, pinned from `datum.hil` and rendered by CI. Every dimension is an assumption; three are disputed. |
 | `governance/qm` submodule | Pinned to `project/datum`. |
 | Decision records | Nine, numberless, at `governance/qm/adr/`. None is an adoption record. |
-| CI | `adr-lint.yml`, `reuse-lint.yml` and `submodule-check.yml` (seed, verbatim), plus `schema.yml`, which runs the documentation against a Mosquitto service container. |
+| CI | `adr-lint.yml`, `reuse-lint.yml` and `submodule-check.yml` (seed, verbatim), plus `schema.yml`, which runs the documentation against a Mosquitto service container, and `firmware.yml`, which validates and compiles the ESPHome configuration in a matrix. |
 | Licensing | `LICENSE`, `LICENSES/` and `REUSE.toml` are in place and `reuse lint` is clean. **The dependency-manifest licence gate WP-6 owes is still unwired** — the REUSE gate is one of the two the org record asks for, not both. |
 
 **Assertions green: 1, 2 and 3 of six.**
@@ -42,7 +60,10 @@ What exists:
    real broker and validates. Qualified: the captured event is a stand-in
    written against the contract until WP-3 produces a real capture. Everything
    else in that path — topic, encoding, retention, schema validation — runs
-   against Mosquitto over a socket.
+   against Mosquitto over a socket. `walkthrough/04-firmware.md` narrows what the
+   stand-in is standing in for: the bytes the firmware would send are checked
+   against the bytes the stand-in carries, so the remaining gap is the device
+   and the contact, not the payload.
 3. A v1-pinned consumer parses a capability-extended event and yields an
    identical `action`. This is the one that matters, and it is demonstrated
    inside the demo rather than off in a test file.
@@ -61,19 +82,19 @@ models none of this, which is the argument for the harness in one paragraph.
 must never grow into an MQTT implementation. The broker is an engine.
 
 **The documentation is the test suite.** `pytest` executes every example under
-`docs/`, plus the module docstrings, so there is nowhere to write an example
+`walkthrough/`, plus the module docstrings, so there is nowhere to write an example
 that is not checked. There is no `tests/` directory and there should not be
 one: a claim that stops being true fails the build instead of going stale.
 
-`README.md` is a shallow onramp and a table of contents. `docs/` carries the
+`README.md` is a shallow onramp and a table of contents. `walkthrough/` carries the
 executable reference: `cookbook.md`, `envelope.md`, `topic-contract.md`,
 `conformance.md`, `cli.md`, `wire.md`. Every one of them is a test.
 `governance/qm/handbook/style-guide.md` is the rule that puts them there, and
 the same rule keeps explanation out of them — inline comments carry clarifying
-facts, `docs/` carries the contract, and a why belongs in a record or a
+facts, `walkthrough/` carries the contract, and a why belongs in a record or a
 retrospective.
 
-`docs/wire.md` is separate from the rest for one reason: it needs a broker.
+`walkthrough/08-wire.md` is separate from the rest for one reason: it needs a broker.
 Without one it is skipped with a stated reason and everything else still runs.
 An external prerequisite for part of a suite is house-normal — apothecary's
 own tests need the `openscad` CLI and browser binaries — but the skip is
@@ -86,13 +107,15 @@ single-event JSON Schema can express a relationship between one payload and the
 one before it. Each event in that fixture is individually valid and should be.
 The invariant is real, so it is enforced by a stateful check (`is_monotonic`)
 and by `datum validate` on an array. Two kinds of guarantee, two kinds of gate,
-both demonstrated in `docs/conformance.md`. A schema asserted to reject all
+both demonstrated in `walkthrough/05-conformance.md`. A schema asserted to reject all
 four would be a fabricated test.
 
 Verified against a real fresh clone, not asserted: `CLAUDE.md` and
 `.github/copilot-instructions.md` resolve to `AGENTS.md` in full; the ADR lint
-is clean over all nine drafts; `git submodule update --remote` lands on the
-branch tip with no drift.
+is clean over all nine drafts. `git submodule update --remote` no longer
+lands with no drift: the pin sat 261 files behind `project/datum` until it
+was bumped on 2026-08-19, and a plain clone leaves the submodule empty
+altogether — `AGENTS.md` now says so under setup.
 
 **Before your first commit,** read `AGENTS.md`. Two rules there will catch you
 out. Human-only contributorship: no `Co-Authored-By:` trailer naming a vendor
@@ -340,7 +363,7 @@ guarantees.
 **Goal:** the documented wire contract, and a way to prove firmware conforms
 without a lab.
 
-**Path:** `schema/topics.py`, `docs/topic-contract.md`, `tests/harness/`
+**Path:** `schema/topics.py`, `walkthrough/03-topic-contract.md`, `tests/harness/`
 
 **Deliverables:**
 
@@ -436,7 +459,7 @@ board.
 
 **Path:** `quaternionmedia/apothecary`, not this repository.
 
-**Deliverables:** `datum-core`, `datum-cap`, `datum-mount-desk`, each as
+**Deliverables:** `datum_core`, `datum_cap`, `datum-mount-desk`, each as
 `parts/<name>/<name>.scad` plus `apothecary/projects/parts/<name>.py` with a
 Pydantic `Params`, `category`, `tags`, `description`, `print_settings` and
 `display_rotation`. Follow `parts/README.md` and `docs/parts-authoring.md`
@@ -453,7 +476,7 @@ underscored.
   the switch dome and the USB cutout.
 - Defaults must render something coherent with no knowledge of this project.
 
-**Acceptance (M1 assertion 5):** `apothecary parts info datum-core` returns
+**Acceptance (M1 assertion 5):** `apothecary parts info datum_core` returns
 the part with non-null bounds; `apothecary parts generate-stl` exits 0;
 apothecary's own test suite passes. In this repository, CI verifies the pinned
 apothecary version renders each part it depends on.
@@ -471,7 +494,7 @@ apothecary version renders each part it depends on.
   containers). The org open-license record provides for this explicitly.
 - REUSE compliance: SPDX identifiers on every file, `LICENSES/` holding full
   texts. CERN-OHL-S-2.0 for `hardware/`, MIT for `schema/` and `firmware/`,
-  CC-BY-SA-4.0 for `docs/`.
+  CC-BY-SA-4.0 for `walkthrough/`.
 - CI fails on an unlicensed file or a non-allowlisted dependency license.
 
 **Acceptance (M1 assertion 6):** both gates report zero violations.
@@ -491,7 +514,7 @@ All six assertions green in CI:
 3. A v1-pinned consumer parses a capability-extended event and yields an
    identical `action`. (WP-1)
 4. KiBot ERC and DRC exit 0; the CC-termination check passes. (WP-4)
-5. `apothecary parts info datum-core` returns non-null bounds; STL generation
+5. `apothecary parts info datum_core` returns non-null bounds; STL generation
    exits 0. (WP-5)
 6. License and REUSE gates report zero violations; every BOM line has two or
    more sources. (WP-4, WP-6)
@@ -553,7 +576,7 @@ governance and therefore where they belong:
 | The fork procedure's symlink-copy guidance is wrong on Windows | `perspectives/2026-08-08-hardware-onramp-invisible-artifacts.md` |
 | The open-license record's enforcement cannot see hardware artifacts | Same perspective, with a proposed org amendment. Q3 above |
 | Gate *absence* is undetectable, and the corpus demonstrates it on itself | Same perspective |
-| The topic contract's retention terms have no record | Named in `docs/topic-contract.md`; drafting one is open work |
+| The topic contract's retention terms have no record | Named in `walkthrough/03-topic-contract.md`; drafting one is open work |
 
 Per the org record a capability gap closes upstream, which is what those
 perspectives are. A private workaround would be a debt against the commons this
