@@ -34,18 +34,21 @@ capture, and until it does, assertion 2 stays qualified exactly as it was — se
 below. Do not read a green firmware build as a working button: a compile proves
 the configuration is buildable and says nothing about a contact on a bench.
 
-Work is on `wp3-firmware`, pushed, as pull request #2, with six checks green
-and nothing merged. The enclosure it depends on is pull request #18 in
-apothecary, which merges first because `datum.hil.APOTHECARY_PIN` names a
-commit on that branch. `planning/HANDOFF-2026-08-20-cycle5.md` is the full
-account, including the two decisions waiting on a human.
+Work is on `consolidate/2026-09-19`, which carries `wp3-firmware` (pull
+request #2, six checks green, nothing merged) plus one repin. The enclosure it
+depends on is apothecary's `consolidate/2026-09-19`, pull request #21 there,
+which folds that repository's three unmerged lines -- the enclosure work of its #18, the
+photo-to-pieces work of its #20, and a firmware toolchain that never had a
+pull request -- into one branch; `datum.hil.APOTHECARY_PIN` names its tip, so
+it merges first. `planning/HANDOFF-2026-08-20-cycle5.md` is the full account
+of WP-3, including the two decisions waiting on a human.
 
 What exists:
 
 | | |
 |---|---|
 | Project repository | `main`, plus `wp3-firmware` as pull request #2. Governance wiring, the schema package, the retrofit demo, the wire harness, the ESPHome configuration at `firmware/`, and the pre-HIL runner behind `datum hil`. No hardware, no geometry. |
-| Enclosure | `datum_core` in apothecary, on pull request #18 there, pinned from `datum.hil` and rendered by CI. Every dimension is an assumption; three are disputed. |
+| Enclosure | `datum_core` in apothecary, on its `consolidate/2026-09-19` branch, pinned from `datum.hil` and rendered by CI. Every dimension is an assumption; three are disputed. |
 | `governance/qm` submodule | Pinned to `project/datum`. |
 | Decision records | Nine, numberless, at `governance/qm/adr/`. None is an adoption record. |
 | CI | `adr-lint.yml`, `reuse-lint.yml` and `submodule-check.yml` (seed, verbatim), plus `schema.yml`, which runs the documentation against a Mosquitto service container, and `firmware.yml`, which validates and compiles the ESPHome configuration in a matrix. |

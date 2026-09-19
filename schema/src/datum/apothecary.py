@@ -38,7 +38,7 @@ APOTHECARY_VERSION: Optional[str] = None
 # The commit standing in for a release until there is one. Bumping it is a
 # reviewed commit here, the same way the governance submodule's pin is -- but a
 # commit is the weaker form of this dependency and is meant to be temporary.
-APOTHECARY_PIN = "2e7d57c"
+APOTHECARY_PIN = "3837828"
 
 # The parts this project depends on, by their names in apothecary's registry.
 # CI renders each one from the pinned apothecary, so an upstream change that
