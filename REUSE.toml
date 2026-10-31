@@ -23,7 +23,7 @@ SPDX-License-Identifier = "MIT"
 
 # --- Documentation (record §4) ----------------------------------------------
 [[annotations]]
-path = ["**.md", "docs/**"]
+path = ["**.md", "walkthrough/**"]
 precedence = "override"
 SPDX-FileCopyrightText = "Copyright (c) 2026 Quaternion Media"
 SPDX-License-Identifier = "CC-BY-SA-4.0"

@@ -1,5 +1,7 @@
 # Conformance vectors
 
+**Hermetic.**
+
 Ten checked-in files under `schema/vectors/`, validated against the **emitted
 JSON Schema** rather than the Python models: a guarantee proved only through
 the models is one a consumer in another language does not have. Executable
@@ -46,4 +48,4 @@ The invariant is real, and takes a stateful check:
     False
 
 Two kinds of guarantee, two kinds of gate. `datum validate` applies the second
-when given an array — see `docs/cli.md`.
+when given an array — see `walkthrough/06-cli.md`.

@@ -326,7 +326,7 @@ datum/
 ├── schema/                     # the seam
 ├── firmware/                   # ESPHome packages + external components
 ├── hardware/t1-core/           # KiCad 9
-├── docs/                       # the executable reference; README.md is an onramp
+├── walkthrough/                # the executable pages; README.md is an onramp
 └── README.md, AGENTS.md, HANDOFF.md
 ```
 
@@ -365,7 +365,7 @@ in the path and no vendor account.
    claim, tested rather than asserted.
 4. `kibot` ERC and DRC both exit 0 for `hardware/t1-core`, and the design rule
    set includes a check that CC1 and CC2 each terminate through 5.1 kΩ.
-5. `apothecary parts info datum-core` returns the part with non-null bounds,
+5. `apothecary parts info datum_core` returns the part with non-null bounds,
    and STL generation exits 0.
 6. The license and REUSE gates report zero violations, and every hardware BOM
    line carries two or more sources.

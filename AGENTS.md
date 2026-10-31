@@ -73,6 +73,17 @@ it is the part that goes stale.
 
 ## Setup and test commands
 
+The governance corpus is a submodule at `governance/qm`, and a plain clone
+leaves it empty. `git clone --recurse-submodules`, or after the fact:
+
+```bash
+git submodule update --init                # governance/qm, or it is an empty directory
+```
+
+Without it every record this file cites is unreadable, `adr-lint` and
+`submodule-check` fail for a reason that has nothing to do with your change,
+and an agent reads this file's *summary* of the corpus instead of the corpus.
+
 ```bash
 uv sync                                    # install
 uv run pytest                              # run the documentation
@@ -80,21 +91,21 @@ uv run datum version                     # schema version
 uv run datum emit                        # JSON Schema -> schema/build/ (never committed)
 uv run datum validate <file.json>        # an event, or an array of them
 
-# docs/wire.md needs a broker. Without one it skips, with a stated reason.
+# walkthrough/08-wire.md needs a broker. Without one it skips, with a stated reason.
 docker run -d --rm -p 11883:1883 eclipse-mosquitto:2
 DATUM_BROKER=host:port uv run pytest     # or point at your own
 ```
 
 **`uv run pytest` runs the documentation, and that is not a turn of phrase.**
-Every `>>>` under `docs/` executes, and module docstrings are collected too.
+Every `>>>` under `walkthrough/` executes, and module docstrings are collected too.
 There is no `tests/` directory and adding one would be a regression: it
 reintroduces the gap between what the docs claim and what the code does. Write
 the example where a reader needs it, and it is a test.
 
 `README.md` is a shallow onramp and a table of contents; the executable
-reference lives in `docs/`, per `governance/qm/handbook/style-guide.md`. That
+reference lives in `walkthrough/`, per `governance/qm/handbook/style-guide.md`. That
 page also fixes where explanation goes: inline comments carry clarifying facts
-about the code, `docs/` carries the contract, and every why belongs in a
+about the code, `walkthrough/` carries the contract, and every why belongs in a
 record or a retrospective rather than beside the thing it describes.
 
 The stack is fixed by `governance/qm/records/DRAFT-house-stack.md`: Python,
@@ -112,9 +123,9 @@ from scratch again.
 | WP | What | Where | State |
 |---|---|---|---|
 | WP-0 | Repository bootstrap | this file, `governance/` | done |
-| WP-1 | The event envelope | `schema/`, `docs/` | done |
-| WP-2 | Topic contract and MQTT harness | `schema/topics.py`, `schema/harness.py`, `docs/wire.md` | done |
-| WP-3 | Firmware, stock ESPHome on ESP32-C6 | `firmware/` | next |
+| WP-1 | The event envelope | `schema/`, `walkthrough/` | done |
+| WP-2 | Topic contract and MQTT harness | `schema/topics.py`, `schema/harness.py`, `walkthrough/08-wire.md` | done |
+| WP-3 | Firmware, stock ESPHome on ESP32-C6 | `firmware/` | in progress, nothing flashed |
 | WP-4 | Hardware, T1-Core, KiCad 9 | `hardware/t1-core/` | |
 | WP-5 | Enclosure | **`quaternionmedia/apothecary`**, not here | |
 | WP-6 | License and REUSE gates | `.github/workflows/` | |

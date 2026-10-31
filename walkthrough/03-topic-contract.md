@@ -1,5 +1,7 @@
 # The topic contract
 
+**Hermetic.**
+
 Any subscriber can implement this. Home Assistant's MQTT Discovery is a
 convenience layered over it, never the contract itself. Executable under
 `uv run pytest`.
@@ -53,7 +55,7 @@ subscriber, so a toggle would flip on every dashboard reload.
 
 A subscriber that arrives after a press receives nothing.
 
-`docs/wire.md` re-runs this against a real broker, where the retain *flag*
+`walkthrough/08-wire.md` re-runs this against a real broker, where the retain *flag*
 behaves in a way an in-process fixture does not model.
 
 **No record covers these retention terms.** The envelope and detention records

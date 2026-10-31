@@ -1,0 +1,168 @@
+# Datum T1-Core -- stock ESPHome on an ESP32-C6.
+#
+# Four dry contacts in, one versioned JSON event out, over the topic contract
+# in `docs/topic-contract.md`. Nothing here switches power.
+#
+# Every string that reaches the wire is a substitution rather than a literal
+# buried in a lambda, because `docs/firmware.md` reads them back out of this
+# file and checks them against `datum.topics` and `datum.envelope`. A topic or
+# a payload that drifts from the Python fails the build.
+
+substitutions:
+  name: datum-t1-core
+  friendly_name: Datum T1 Core
+
+  # Identity. `src` is the topic path as well as the name, so every topic
+  # below derives from this one string.
+  src: datum/lab/jig
+  hw: t1-core-r0
+  fw: 0.1.0
+  schema_version: 1.0.0
+
+  # The two payloads, byte for byte. `str_sprintf` fills these inside a C++
+  # raw string literal, so the quotes survive substitution unescaped. Field
+  # order matches the Pydantic models: a consumer diffing bytes sees no
+  # difference between an event from here and one from `Event.wire_json()`.
+  event_format: '{"src":"%s","seq":%u,"caps":["press"],"action":"%s","ch":%d}'
+  announce_format: '{"schema_version":"%s","src":"%s","caps":["press"],"hw":"%s","fw":"%s"}'
+
+  # GPIO map. None of these is a strapping pin (4, 5, 8, 9, 15), a USB pin
+  # (12, 13) or a UART0 pin (16, 17). The indicator is on 8, which is a
+  # strapping pin and is where the DevKitC-1 puts its own addressable LED.
+  contact_0_pin: GPIO2
+  contact_1_pin: GPIO3
+  contact_2_pin: GPIO10
+  contact_3_pin: GPIO11
+  indicator_pin: GPIO8
+
+  # Gesture timing.
+  debounce: 20ms
+  gap: 400ms
+  hold: 900ms
+
+  # Overridden by a wrapper config or `-s` on the command line. Present as
+  # defaults so the configuration compiles in CI with no secrets file.
+  wifi_ssid: changeme
+  wifi_password: changeme
+  mqtt_broker: 127.0.0.1
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+
+esp32:
+  board: esp32-c6-devkitc-1
+  framework:
+    type: esp-idf
+
+logger:
+
+wifi:
+  ssid: ${wifi_ssid}
+  password: ${wifi_password}
+
+globals:
+  # Monotonic across a broker reconnect, and across a reboot: `restore_value`
+  # puts it in the preference store, so a power cycle does not hand a consumer
+  # a sequence that goes backwards.
+  - id: seq
+    type: uint32_t
+    restore_value: true
+    initial_value: '0'
+
+  # One flag per channel, so a release is emitted only after a hold and not
+  # after every press.
+  - id: held
+    type: bool[4]
+    restore_value: false
+    initial_value: '{}'
+
+mqtt:
+  id: mqtt_client
+  broker: ${mqtt_broker}
+
+  # This device publishes the envelope and nothing else. Discovery and the
+  # default per-component state topics would put payloads on the wire that no
+  # part of the contract describes.
+  discovery: false
+  topic_prefix: null
+
+  birth_message:
+    topic: ${src}/status
+    payload: online
+    retain: true
+
+  # Retained, so a late subscriber reads "offline" rather than a silence it
+  # has to interpret.
+  will_message:
+    topic: ${src}/status
+    payload: offline
+    retain: true
+
+  on_connect:
+    - lambda: |-
+        id(mqtt_client)->publish(
+            R"(${src}/announce)",
+            str_sprintf(R"(${announce_format})",
+                        R"(${schema_version})", R"(${src})", R"(${hw})", R"(${fw})"),
+            0, true);
+
+script:
+  # The one place an event reaches the wire. Not retained: an event is a
+  # moment, and a retained press is redelivered to every consumer that
+  # reconnects.
+  - id: emit
+    mode: restart
+    parameters:
+      ch: int
+      action: string
+    then:
+      - lambda: |-
+          id(mqtt_client)->publish(
+              R"(${src}/event)",
+              str_sprintf(R"(${event_format})",
+                          R"(${src})", id(seq)++, action.c_str(), ch),
+              0, false);
+      - light.turn_on:
+          id: indicator
+          brightness: 60%
+          red: 0%
+          green: 100%
+          blue: 0%
+      - delay: 60ms
+      - light.turn_off: indicator
+
+light:
+  - platform: esp32_rmt_led_strip
+    id: indicator
+    name: Indicator
+    pin: ${indicator_pin}
+    num_leds: 1
+    chipset: SK6812
+    rgb_order: GRB
+    default_transition_length: 0s
+
+packages:
+  contact_0: !include
+    file: contact.yaml
+    vars:
+      ch: '0'
+      pin: ${contact_0_pin}
+
+  contact_1: !include
+    file: contact.yaml
+    vars:
+      ch: '1'
+      pin: ${contact_1_pin}
+
+  contact_2: !include
+    file: contact.yaml
+    vars:
+      ch: '2'
+      pin: ${contact_2_pin}
+
+  contact_3: !include
+    file: contact.yaml
+    vars:
+      ch: '3'
+      pin: ${contact_3_pin}
